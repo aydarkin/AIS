@@ -12,6 +12,8 @@ namespace Back
         public DbSet<Message> Messages { get; set; }
         public DbSet<Interest> Interests { get; set; }
         public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<Country> Countries { get; set; }
+        public DbSet<City> Cities { get; set; }
 
         public AppDBContext()
         {

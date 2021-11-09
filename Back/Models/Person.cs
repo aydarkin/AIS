@@ -4,8 +4,7 @@ namespace Back.Models
 {
     public class Person
     {
-        public int Id { get; set; }
-
+        [Key]
         public int UserId { get; set; }
         public User User { get; set; }
 
