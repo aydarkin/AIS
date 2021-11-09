@@ -1,0 +1,28 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Back.Models;
+
+namespace Back
+{
+    public class AppDBContext : DbContext
+    {
+        public DbSet<User> Users { get; set; }
+        public DbSet<Person> Persons { get; set; }
+        public DbSet<Image> Images { get; set; }
+        public DbSet<Gender> Genders { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Interest> Interests { get; set; }
+        public DbSet<Friendship> Friendships { get; set; }
+
+        public AppDBContext()
+        {
+            // пересоздание бд
+            Database.EnsureDeleted();
+            Database.EnsureCreated();
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        {
+            builder.UseNpgsql("Host=localhost;Port=5432;Database=ais;Username=postgres;Password=123qwe");
+        }
+    }
+}
