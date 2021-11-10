@@ -12,6 +12,8 @@ namespace Back.Models
         [Required]
         public string Password { get; set; }
 
+        public DateTime BirthDate { get; set; }
+
         public Person? Person { get; set; }
     }
 }

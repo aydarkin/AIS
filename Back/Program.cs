@@ -16,6 +16,31 @@ var app = builder.Build();
 // TODO пока для первичного пересоздания бд
 using (var db = new Back.AppDBContext()) 
 {
+    // api/Model/ :
+    // (Создание) - POST, вход json с полями, возвращает json объекта
+    // (Обновление) - PATCH, вход json с полями, возвращает json объекта
+
+    // api/Model/:id
+    // (Удаление) - DELETE, вход id в строке, возвращает true
+    // (Чтение) - GET, вход id в строке, возвращает true
+
+    // api/Model?параметры_фильтрации (типа http://localhost:57086/Home/Area?altitude=20&height=4)
+    // (Списочный) GET, вход в строке, возвращает json массив объектов
+
+    // Для Friendships отдельные методы
+    // api/friendship/link - POST, на входе json {From: ид_заявителя, To: ид_кого}, возвращает тип дружбы (0, 1, 2)
+    //       Примечание: FirstID < SecondID
+    // api/friendship/unlink - POST, на входе json {From: ид_заявителя, To: ид_кого}, возвращает тип дружбы (0, 1, 2)
+
+    // Для Interests уточнение по списочному
+    // api/interests?IncludePersons=true в результат добавить массив объектов пользователей
+
+    // Для Persons уточнение по списочному
+    // api/persons?IncludeInterests=true в результат добавить массив объектов интересов
+
+    // Для Persons уточнение по списочному
+    // сортировка по фамилии по алфавиту
+
     db.Genders.Add(new Gender() { Title = "Мужской" });
     db.Genders.Add(new Gender() { Title = "Женский" });
     db.Genders.Add(new Gender() { Title = "Другой" });
@@ -33,6 +58,17 @@ using (var db = new Back.AppDBContext())
     var demo = new User() { Login = "demo", Password = "demo" };
     db.Users.Add(demo);
     db.Persons.Add(new Person() { Name = "Демо пользователь", User = demo });
+
+    var demo1 = new User() { Login = "demo1", Password = "demo1" };
+    db.Users.Add(demo1);
+    db.Persons.Add(new Person() { Name = "Подписчик", User = demo1 });
+    db.Friendships.Add(new Friendship() { First = demo.Person, Second = demo1.Person, Direction = FriendDirection.SecondToFirst});
+
+
+    var demo2 = new User() { Login = "demo2", Password = "demo2" };
+    db.Users.Add(demo2);
+    db.Persons.Add(new Person() { Name = "Друг", User = demo2 });
+    db.Friendships.Add(new Friendship() { First = demo.Person, Second = demo2.Person, Direction = FriendDirection.Both });
 
     db.SaveChanges();
 }

@@ -26,5 +26,10 @@ namespace Back
         {
             builder.UseNpgsql("Host=localhost;Port=5432;Database=ais;Username=postgres;Password=123qwe");
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().HasIndex(u => u.Login).IsUnique();
+        }
     }
 }
