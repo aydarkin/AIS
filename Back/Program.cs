@@ -32,6 +32,7 @@ using (var db = new Back.AppDBContext())
     //       Примечание: FirstID < SecondID
     // api/friendship/unlink - POST, на входе json {From: ид_заявителя, To: ид_кого}, возвращает тип дружбы (0, 1, 2)
 
+
     // Для Interests уточнение по списочному
     // api/interests?IncludePersons=true в результат добавить массив объектов пользователей
 
@@ -40,6 +41,11 @@ using (var db = new Back.AppDBContext())
 
     // Для Persons уточнение по списочному
     // сортировка по фамилии по алфавиту
+
+    // Для Messages уточнение по списочному
+    // api/messages?Person=123 все входящие и исходящие сообщения отсортированные по дате (сначала новее)
+    // также в результате не просто id пользователей, а их объекты
+    // пример => [{Id: 1, Text: "Привет", From: { Id: 123, Name: ... }, To: { Id: 124, Name: ... }}, ...]
 
     db.Genders.Add(new Gender() { Title = "Мужской" });
     db.Genders.Add(new Gender() { Title = "Женский" });
