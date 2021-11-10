@@ -1,4 +1,7 @@
+using Back;
 using Back.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,16 +12,43 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // цепляем БД
-builder.Services.AddDbContext<Back.AppDBContext>();
+builder.Services.AddDbContext<AppDBContext>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            // укзывает, будет ли валидироваться издатель при валидации токена
+            ValidateIssuer = true,
+            // строка, представляющая издателя
+            ValidIssuer = AuthOptions.ISSUER,
+
+            // будет ли валидироваться потребитель токена
+            ValidateAudience = true,
+            // установка потребителя токена
+            ValidAudience = AuthOptions.AUDIENCE,
+            // будет ли валидироваться время существования
+            ValidateLifetime = true,
+
+            // установка ключа безопасности
+            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+            // валидация ключа безопасности
+            ValidateIssuerSigningKey = true,
+        };
+    })
+    .AddCookie(); ;
+// builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
 // TODO пока для первичного пересоздания бд
-using (var db = new Back.AppDBContext()) 
+using (var db = new AppDBContext())
 {
     // api/Model/ :
     // (Создание) - POST, вход json с полями, возвращает json объекта
-    // (Обновление) - PATCH, вход json с полями, возвращает json объекта
+    // (Обновление) - PUT, вход json с полями, возвращает json объекта
 
     // api/Model/:id
     // (Удаление) - DELETE, вход id в строке, возвращает true
@@ -46,6 +76,9 @@ using (var db = new Back.AppDBContext())
     // api/messages?Person=123 все входящие и исходящие сообщения отсортированные по дате (сначала новее)
     // также в результате не просто id пользователей, а их объекты
     // пример => [{Id: 1, Text: "Привет", From: { Id: 123, Name: ... }, To: { Id: 124, Name: ... }}, ...]
+
+    db.Database.EnsureDeleted();
+    db.Database.EnsureCreated();
 
     db.Genders.Add(new Gender() { Title = "Мужской" });
     db.Genders.Add(new Gender() { Title = "Женский" });
@@ -87,9 +120,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.Run();

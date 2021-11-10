@@ -17,9 +17,7 @@ namespace Back
 
         public AppDBContext()
         {
-            // пересоздание бд
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
+
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
