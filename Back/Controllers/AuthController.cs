@@ -50,8 +50,8 @@ namespace Back.Controllers
                 username = identity.Name
             };
 
-            this.Response.Cookies.Append("token", "" + encodedJwt);
-            this.Response.Cookies.Append("username", "" + identity.Name);
+            this.Response.Cookies.Append("token", encodedJwt);
+            this.Response.Cookies.Append("username", identity.Name ?? "");
 
             return response;
         }

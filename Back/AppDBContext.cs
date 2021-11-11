@@ -27,7 +27,11 @@ namespace Back
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().HasIndex(u => u.Login).IsUnique();
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Login).IsUnique();
+
+            modelBuilder.Entity<Friendship>()
+                .HasKey(u => new { u.FirstId, u.SecondId });
         }
     }
 }

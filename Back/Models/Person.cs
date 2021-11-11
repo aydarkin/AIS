@@ -15,6 +15,7 @@ namespace Back.Models
         public DateTime? BirthDate { get; set; }
         public Image? Avatar { get; set; }
         public Gender? Gender { get; set; }
+        public City? City { get; set; }
         public List<Interest> Interests { get; set; } = new List<Interest>();
     }
 }
