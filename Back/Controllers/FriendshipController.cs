@@ -1,5 +1,6 @@
 ﻿using Back.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Back.Controllers
 {
@@ -13,28 +14,47 @@ namespace Back.Controllers
             List<Friendship> friendships;
             using (var db = new AppDBContext())
             {
-                friendships = db.Friendships.ToList();
+                friendships = db.Friendships
+                    // детализируем сущности Person
+                    .Include(f => f.First)
+                    .Include(f => f.Second)
+
+                    // в Person детализируем Gender
+                    .ThenInclude(p => p.Gender)
+                    
+                    .ToList();
             }
             return friendships;
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Friendship> Get(int id)
+        public ActionResult<List<Friendship>> Get(int id)
         {
-            Friendship friendship;
+            List<Friendship> friendships;
             using (var db = new AppDBContext())
             {
-                friendship = db.Friendships.Find(id);
-            }
-            if (friendship == null)
-                return NotFound();
+                friendships = db.Friendships
+                    // фильтр
+                    .Where(f => f.FirstId == id || f.SecondId == id)
 
-            return friendship;
+                    // детализируем сущности Person
+                    .Include(f => f.First)
+                    .Include(f => f.Second)
+
+                    // в Person детализируем Gender
+                    .ThenInclude(p => p.Gender)
+
+                    .ToList();
+            }
+
+            return friendships;
         }
 
         [HttpPost]
         public ActionResult<Friendship> Post([FromBody] Friendship item)
         {
+            // TODO перейти на механизм изменения направления дружбы
+
             Friendship friendship;
             using (var db = new AppDBContext())
             {
@@ -48,6 +68,8 @@ namespace Back.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
+            // TODO перейти на механизм изменения направления дружбы
+
             using (var db = new AppDBContext())
             {
                 var forDelete = db.Friendships.Find(id);

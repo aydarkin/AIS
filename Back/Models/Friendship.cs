@@ -12,10 +12,10 @@ namespace Back.Models
     public class Friendship
     {
         public int FirstId { get; set; }
-        public Person First { get; set; }
+        public Person? First { get; set; }
 
         public int SecondId { get; set; }
-        public Person Second { get; set; }
+        public Person? Second { get; set; }
 
         [Required]
         public FriendDirection Direction { get; set; }

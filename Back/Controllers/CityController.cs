@@ -1,5 +1,6 @@
 ﻿using Back.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Back.Controllers
 {
@@ -13,7 +14,9 @@ namespace Back.Controllers
             List<City> cities;
             using (var db = new AppDBContext())
             {
-                cities = db.Cities.ToList();
+                cities = db.Cities
+                    .Include(c => c.Country) // подгружаем связанные данные
+                    .ToList();
             }
             return cities;
         }
@@ -25,6 +28,9 @@ namespace Back.Controllers
             using (var db = new AppDBContext())
             {
                 city = db.Cities.Find(id);
+
+                // грузим связанный объект, он автоматически привяжется к city.Country
+                db.Countries.Where(c => c.Id == city.CountryId).Load();
             }
             if (city == null)
                 return NotFound();
@@ -38,10 +44,15 @@ namespace Back.Controllers
             City city;
             using (var db = new AppDBContext())
             {
+                // добавляем и получаем отслеживаемую сущность
                 city = db.Cities.Add(item).Entity;
-                db.SaveChanges();
-            }
 
+                // выполняем запрос
+                db.SaveChanges();
+
+                // грузим связанный объект, он автоматически привяжется к city.Country
+                db.Countries.Where(c => c.Id == city.CountryId).Load();
+            }
             return city;
         }
 

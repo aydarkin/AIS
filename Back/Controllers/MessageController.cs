@@ -8,12 +8,23 @@ namespace Back.Controllers
     public class MessageController : ControllerBase
     {
         [HttpGet]
-        public IEnumerable<Message> Get()
+        public IEnumerable<Message> Get(int? from, int? to)
         {
-            List<Message> messages;
+            IEnumerable<Message> messages;
             using (var db = new AppDBContext())
             {
-                messages = db.Messages.ToList();
+                // конвеер пошел!
+                messages = db.Messages;
+
+                // добавляем фильтр по отправителю, если есть
+                if (from != null)
+                    messages = messages.Where(m => m.FromId == from);
+
+                // добавляем фильтр по получателю, если есть
+                if (to != null)
+                    messages = messages.Where(m => m.ToId == to);
+
+                messages = messages.ToList();
             }
             return messages;
         }

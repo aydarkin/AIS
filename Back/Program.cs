@@ -110,6 +110,12 @@ using (var db = new AppDBContext())
     db.Friendships.Add(new Friendship() { First = demo.Person, Second = demo2.Person, Direction = FriendDirection.Both });
 
     db.SaveChanges();
+
+    db.Messages.Add(new Message() { Date = new DateTime(), FromId = demo.Id, ToId = demo1.Id, Text = "Привет demo1" });
+    db.Messages.Add(new Message() { Date = new DateTime(), FromId = demo.Id, ToId = demo2.Id, Text = "Привет demo2" });
+    db.Messages.Add(new Message() { Date = new DateTime(), FromId = demo1.Id, ToId = demo.Id, Text = "Привет demo" });
+
+    db.SaveChanges();
 }
 
 // Configure the HTTP request pipeline.

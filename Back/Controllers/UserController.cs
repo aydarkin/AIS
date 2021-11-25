@@ -1,6 +1,9 @@
 ﻿using Back.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -67,7 +70,7 @@ namespace Back.Controllers
                 if (item.Password != null)
                     editable.Password = item.Password;
 
-                //db.Users.Update(editable);
+                db.Users.Update(editable);
                 db.SaveChanges();
             }
 
