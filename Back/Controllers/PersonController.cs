@@ -17,7 +17,8 @@ namespace Back.Controllers
                 persons = db.Persons
                     .Include(x => x.Avatar)
                     .Include(x => x.Gender)
-                    .Include(x => x.City) // добавить привязку страны, пока чисто город
+                    .Include(x => x.City)
+                    .Include("City.Country")
                     .Include(x => x.Interests)
                     .ToList();
             }

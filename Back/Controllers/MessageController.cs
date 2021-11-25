@@ -1,5 +1,6 @@
 ﻿using Back.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Back.Controllers
 {
@@ -53,6 +54,9 @@ namespace Back.Controllers
             {
                 message = db.Messages.Add(item).Entity;
                 db.SaveChanges();
+
+                db.Messages.Where(c => c.Id == message.FromId).Load();
+                db.Messages.Where(c => c.Id == message.ToId).Load();
             }
 
             return message;
