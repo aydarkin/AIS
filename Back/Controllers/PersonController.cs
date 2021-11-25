@@ -67,11 +67,20 @@ namespace Back.Controllers
                 if (editable == null)
                     return NotFound();
 
-                if (item.Avatar != null)
-                    editable.Avatar = item.Avatar;
+                if (item.Name != null)
+                    editable.Name = item.Name;
 
-                if (item.City != null)
-                    editable.City = item.City;
+                if (item.Surname != null)
+                    editable.Surname = item.Surname;
+
+                if (item.Patronymic != null)
+                    editable.Patronymic = item.Patronymic;
+
+                if (item.BirthDate != null)
+                    editable.BirthDate = item.BirthDate;
+
+                if (item.CityId != null)
+                    editable.CityId = item.CityId;
 
                 db.SaveChanges();
             }

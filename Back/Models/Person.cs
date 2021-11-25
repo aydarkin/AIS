@@ -26,7 +26,6 @@ namespace Back.Models
         public City? City { get; set; }
 
         [BindNever]
-        [JsonIgnore]
         public List<Interest> Interests { get; set; } = new List<Interest>();
     }
 }
