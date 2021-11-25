@@ -70,7 +70,6 @@ namespace Back.Controllers
                 if (item.Password != null)
                     editable.Password = item.Password;
 
-                db.Users.Update(editable);
                 db.SaveChanges();
             }
 
