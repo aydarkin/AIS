@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Back.Models
 {
@@ -9,6 +10,7 @@ namespace Back.Models
         [Required]
         public string Title { get; set; }
 
+        [JsonIgnore]
         public List<Person> Persons { get; set; } = new List<Person>();
     }
 }
