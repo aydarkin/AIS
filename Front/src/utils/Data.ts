@@ -28,7 +28,9 @@ export default class Data {
         const response = await fetch(this.domain + relativeURL, params);
         if(response.status >= 200 && response.status < 300) {
             if(waitResult) {
-                return await response.json();
+                if (['POST', 'GET'].includes(method)) {
+                    return await response.json();
+                }
             }
             return;
         }
@@ -58,6 +60,14 @@ export default class Data {
                 break;
         }
         return await this.query(relativeURL, 'POST',  contentType, body, waitResult);
+    }
+
+    static async putQuery(relativeURL: string, body: any, waitResult = true) {
+        return await this.query(relativeURL, 'PUT',  'application/json', JSON.stringify(body), waitResult);
+    }
+
+    static async deleteQuery(relativeURL: string, waitResult = true) {
+        return await this.query(relativeURL, 'DELETE',  undefined, undefined, waitResult);
     }
 
     static async jsonQuery(relativeURL: string, params: any, waitResult = true) {

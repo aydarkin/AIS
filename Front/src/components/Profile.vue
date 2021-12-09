@@ -41,7 +41,6 @@
               position="is-top-left"
               v-model="selectedDate"
               :show-week-number="showWeekNumber"
-              :locale="locale"
               placeholder="Введите вашу дату рождения"
               icon="calendar"
               icon-pack="fas"
@@ -55,7 +54,7 @@
         </b-tab-item>
         <b-tab-item label="Местожительство">
           <b-field label="Город">
-            <b-select expanded v-model="type" placeholder="Выберите свой город">
+            <b-select expanded v-model="profile.cityId" placeholder="Выберите свой город">
               <option v-for="city in cities" v-bind:key="city.id" :value="city.id">
                 {{`${city.title} (${city.country.title})`}}
               </option>
@@ -139,7 +138,7 @@
         <b-tab-item label="Интересы">
           <b-field label="Мои интересы">
             <b-taginput
-              v-model="selectedTags"
+              v-model="profile.interests"
               ellipsis
               icon="angle-right"
               icon-pack="fas"
@@ -199,7 +198,7 @@
           </div>
         </div>
       </div>
-      <b-button type="is-danger" class="m-5">Сохранить</b-button>
+      <b-button type="is-danger" class="m-5" @click="save">Сохранить</b-button>
     </div>
   </div>
 </template>
@@ -209,6 +208,7 @@ import Vue from "vue";
 import Profile from "../utils/Profile";
 import Data from "../utils/Data";
 import Cookie from "@/utils/Cookie";
+import { ToastProgrammatic as Toast } from 'buefy';
 
 interface IState {
   selectedDate?: Date | null;
@@ -229,72 +229,11 @@ export default Vue.extend({
       cities: [],
       selectedDate: null,
       showWeekNumber: false,
-      locale: undefined, // Browser localeS
       filteredTags: undefined,
-      selectedTags: [],
       tags: undefined,
-      friends: [
-        // {
-        //   id: 0,
-        //   surname: "Иванов",
-        //   name: "Иван",
-        //   patronymic: "Иванович",
-        //   img: "`@/assets/person.png`",
-        // },
-        // {
-        //   id: 1,
-        //   surname: "Петров",
-        //   name: "Петр",
-        //   patronymic: "Петрович",
-        //   img: "`@/assets/person.png`",
-        // },
-      ],
-      subscribers: [
-        // {
-        //   id: 0,
-        //   surname: "Викторов",
-        //   name: "Виктор",
-        //   patronymic: "Викторович",
-        //   img: "@/assets/person.png",
-        // },
-        // {
-        //   id: 1,
-        //   surname: "Александров",
-        //   name: "Алексей",
-        //   patronymic: "Александрович",
-        //   img: "@/assets/person.png",
-        // },
-        // {
-        //   id: 2,
-        //   surname: "Иванов",
-        //   name: "Иван",
-        //   patronymic: "Иванович",
-        //   img: "@/assets/person.png",
-        // },
-      ],
-      subscriptions: [
-        // {
-        //   id: 0,
-        //   surname: "Викторов",
-        //   name: "Виктор",
-        //   patronymic: "Викторович",
-        //   img: "@/assets/person.png",
-        // },
-        // {
-        //   id: 1,
-        //   surname: "Александров",
-        //   name: "Алексей",
-        //   patronymic: "Александрович",
-        //   img: "@/assets/person.png",
-        // },
-        // {
-        //   id: 2,
-        //   surname: "Иванов",
-        //   name: "Иван",
-        //   patronymic: "Иванович",
-        //   img: "@/assets/person.png",
-        // },
-      ],
+      friends: [],
+      subscribers: [],
+      subscriptions: [],
     } as IState;
   },
   async created() {
@@ -314,14 +253,8 @@ export default Vue.extend({
       this.selectedDate = new Date(profile.birthDate);
     }
 
-    this.selectedTags = profile.interests;
     this.tags = allInterests;
     this.cities = allcities;
-    // [
-    //   { id: 0, title: "Книги" },
-    //   { id: 1, title: "Кинофильмы" },
-    //   { id: 2, title: "Музыка" },
-    // ];
 
     this.friends = friendship
       .filter((f: any) => f.direction == 2)
@@ -346,17 +279,27 @@ export default Vue.extend({
     // флаг для отрисовки всего
     this.loaded = true;
   },
-  watch: {},
+  watch: {
+    selectedDate(newValue: Date) {
+      this.profile.birthDate = newValue.toISOString();
+    }
+  },
   methods: {
+    save() {
+      const myId = Cookie.getCookie("userId");
+      Data.putQuery('person/' + myId, this.profile).then(() => {
+        Toast.open({message: 'Сохранение прошло успешно', type: 'is-success' })
+      }).catch(() => {
+        Toast.open({message: 'Сохранение не удалось', type: 'is-danger' })
+      });
+    },
     clearDate(): void {
-      console.log("clear");
-
       this.selectedDate = null;
     },
     getFilteredTags(text: string) {
       this.filteredTags = this.tags.filter((interest: IInterest) => {
         return (
-          !this.selectedTags.some(
+          !this.profile.interests?.some(
             (selected: IInterest) => interest.id === selected.id
           ) && interest.title.toLowerCase().indexOf(text.toLowerCase()) >= 0
         );
@@ -410,6 +353,7 @@ export default Vue.extend({
 }
 
 .person__name {
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }

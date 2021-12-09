@@ -11,7 +11,6 @@ namespace Back.Controllers
 {
     [Route("api/user")]
     [ApiController]
-    [Authorize]
     public class UserController : ControllerBase
     {
         // GET: api/user

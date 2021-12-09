@@ -1,6 +1,6 @@
 <template>
   <div class="is-flex is-flex-wrap-wrap is-justify-content-space-around mt-5">
-    <div class="card messenger mb-5">
+    <div class="card messenger mb-5" v-if="loaded">
       <b-tabs
         v-model="tabId"
         vertical
@@ -10,21 +10,20 @@
       >
         <b-tab-item
           v-for="interlocutor in allInterlocutors"
-          v-bind:key="interlocutor.id"
+          v-bind:key="interlocutor.userId"
         >
           <template v-slot:header>
             <div
               class="
-                person__item
-                is-flex is-flex-wrap-nowrap is-justify-content-start
+                person__item is-clipped
+                is-flex is-flex-wrap-nowrap is-justify-content-start is-align-items-center
               "
             >
-              <figure class="image is-32x32">
+              <figure class="image is-32x32 is-flex-shrink-0">
                 <img src="@/assets/person.png" />
               </figure>
-              <p class="is-flex is-align-self-center">
-                {{ interlocutor.surname }} {{ interlocutor.name }}
-                {{ interlocutor.patronymic }}
+              <p class="person__name is-flex-shrink-1 is-flex-grow-1 is-clipped" :title="`${interlocutor.surname} ${interlocutor.name} ${interlocutor.patronymic}`">
+                {{ interlocutor.surname }} {{ interlocutor.name }} {{ interlocutor.patronymic }}
               </p>
             </div>
           </template>
@@ -37,7 +36,7 @@
             <div
               v-for="message in currentMessages"
               v-bind:key="message.id"
-              class="interlocutor__message is-size-6 is-flex"
+              class="interlocutor__message is-size-6 is-flex is-clipped"
             >
               <div
                 class="
@@ -50,14 +49,14 @@
                 </figure>
                 <p class="person__name is-size-7">
                   {{
-                    interlocutor.id == message.fromId ? interlocutor.name : "Вы"
+                    interlocutor.userId == message.fromId ? interlocutor.name : "Вы"
                   }}
                 </p>
               </div>
-              <div class="is-flex is-flex-direction-column is-align-items-center">
+              <div class="is-flex is-flex-direction-column">
                 <p class="is-size-7">{{ getDateText(message.date)}}</p>
                 <b-message
-                  :type="interlocutor.id == message.fromId ? 'is-danger' : ''"
+                  :type="interlocutor.userId == message.fromId ? 'is-danger' : ''"
                 >
                   {{ message.text }}
                 </b-message>
@@ -71,12 +70,11 @@
       class="
         card
         contact__form
-        is-flex is-justify-content-space-around
-        pt-2
-        pb-2
+        is-flex
+        pt-4 pl-4 pr-4 pb-2
       "
     >
-      <b-field class="contact__form_textarea">
+      <b-field class="contact__form_textarea is-flex-grow-1 mr-3">
         <b-input placeholder="Напишите сообщение"></b-input>
       </b-field>
       <b-button type="is-primary">Отправить</b-button>
@@ -86,83 +84,35 @@
 
 <script lang="ts">
 import Vue from "vue";
+import Profile from "../utils/Profile";
+import Data from "../utils/Data";
+import Cookie from "@/utils/Cookie";
+
+interface IMessage {
+  fromId: number;
+  toId: number;
+  text: string;
+}
 
 export default Vue.extend({
   data() {
     return {
-      allInterlocutors: [
-        {
-          id: 2,
-          surname: "Иванов",
-          name: "Иван",
-          patronymic: "Иванович",
-          img: "@/assets/person.png",
-          interests: [
-            {
-              id: 0,
-              title: "Интерес 1",
-            },
-            {
-              id: 1,
-              title: "Интерес 2",
-            },
-          ],
-        },
-        {
-          id: 3,
-          surname: "Петров",
-          name: "Петр",
-          patronymic: "Петрович",
-          img: "@/assets/person.png",
-          interests: [
-            {
-              id: 0,
-              title: "Интерес 1",
-            },
-            {
-              id: 1,
-              title: "Интерес 2",
-            },
-          ],
-        },
-      ],
+      loaded: false,
+
+      profile: undefined,
+      allInterlocutors: [] as any[],
 
       interlocutorId: 2,
       myId: 1,
-      tabId: 1,
-      messages: [
-        {
-          id: 1,
-          fromId: 2,
-          toId: 1,
-          text: "Привет demo",
-          image: null,
-          date: "0001-01-01T00:00:00",
-        },
-        {
-          id: 2,
-          fromId: 1,
-          toId: 3,
-          text: "Привет demo2",
-          image: null,
-          date: "0001-01-01T00:00:00",
-        },
-        {
-          id: 3,
-          fromId: 1,
-          toId: 2,
-          text: "Привет demo1",
-          image: null,
-          date: "0001-01-01T00:00:00",
-        },
-      ],
+      tabId: 0,
+      messages: [] as IMessage[],
     };
   },
   computed: {
     currentMessages(): object[] {
-      // фильтр собеседник входящий и я исходящий или собеседник исходящий и я входящий
-
-      return this.messages.filter((mes) => {
+      console.log(this.messages);
+      
+      return this.messages.filter((mes: any) => {       
         return (
           (mes.fromId === this.interlocutorId && mes.toId === this.myId) ||
           (mes.fromId === this.myId && mes.toId === this.interlocutorId)
@@ -170,16 +120,44 @@ export default Vue.extend({
       });
     },
   },
-  created() {
-    // грузим все сообщения в this.messages
+  async created() {
+    const myId = Cookie.getCookie("userId");
+
+    const promises = [];
+    promises.push(Profile.model);
+    promises.push(Data.getQuery("message", {from: myId || ''}));
+    promises.push(Data.getQuery("message", {to: myId || ''}));
+    promises.push(Data.getQuery("person"));
+
+    const [profile, inputMessages, outputMessages, persons] = await Promise.all(
+      promises
+    );
+    this.profile = profile;
+
+    const allMessages = inputMessages;
+    outputMessages.forEach((mes: any) => {
+      allMessages.push(mes);
+    });
+
+    const ids = new Set();
+    allMessages.forEach((mes: any) => {
+      ids.add(mes.fromId == myId ? mes.toId : mes.fromId);
+    });
+    
+    this.allInterlocutors = Array.from(ids).map((id) => persons.find((person: any) => person.userId === id));
+
+    this.interlocutorId = this.allInterlocutors[0].userId;
+    this.messages = allMessages;
+
+    // флаг для отрисовки всего
+    this.loaded = true;
   },
   watch: {
-    // call again the method if the route changes
-    $route: "fetchData",
+
   },
   methods: {
     onTabChange() {
-      this.interlocutorId = this.allInterlocutors[this.tabId].id;
+      this.interlocutorId = (this.allInterlocutors[this.tabId] as any).userId;
     },
 
     getDateText(dateISO: string): string {
@@ -193,11 +171,15 @@ export default Vue.extend({
 <style>
 .person__item {
   gap: 8px;
-  width: 200px;
+  width: 320px;
+}
+
+.person__name {
+  text-overflow: ellipsis;
 }
 
 .interlocutor__avatar {
-  width: 32px;
+  width: 48px;
 }
 
 .interlocutor__message,

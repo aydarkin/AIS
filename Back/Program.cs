@@ -190,37 +190,37 @@ using (var db = new AppDBContext())
 
     db.SaveChanges();
 
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = demo.Id, ToId = demo1.Id, Text = "Привет demo1" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = demo.Id, ToId = demo2.Id, Text = "Привет demo2" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = demo1.Id, ToId = demo.Id, Text = "Привет demo" });
-
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = banana.Id, ToId = cooky.Id, Text = "Чао, персик, дозревай" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cherry.Id, ToId = berry.Id, Text = "Я поменял пол" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = berry.Id, ToId = cherry.Id, Text = "Какой пол?" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cherry.Id, ToId = berry.Id, Text = "ЛАМИНАААААААААААААААТ" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cooky.Id, ToId = banana.Id, Text = "Классный трек. Послухай вмести со мной и моими братками" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = orange.Id, ToId = apple.Id, Text = "Почему у меня нет друзей? Мне так одиноко..." });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = apple.Id, ToId = orange.Id, Text = "Не знаю... Может тебе стоит поменять полы?:D" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = orange.Id, ToId = apple.Id, Text = "......." });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = banana.Id, ToId = demo.Id, Text = "Докажи что ты не кремлебот" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = demo.Id, ToId = banana.Id, Text = "Олег занят, перезвоните позднее....." });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = apple.Id, ToId = cooky.Id, Text = "Тут не занято?) Я подсяду? Скинть домашку по матеше пж:X" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cooky.Id, ToId = apple.Id, Text = "Какую домашку, предурок? Тебе завтра на работу. А ну-ка ноги в руки и пошел чистить унитаз" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cherry.Id, ToId = berry.Id, Text = "Эй, сп, семки есть? А если найду?" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = berry.Id, ToId = cherry.Id, Text = "Ты шо, опять до 6 утра аниме пялил?" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cherry.Id, ToId = berry.Id, Text = "Да, вчера посмотрел токийского гуля, теперь я дед инсайд" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = berry.Id, ToId = cherry.Id, Text = "Ты не дед, максимум дебил" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = berry.Id, ToId = banana.Id, Text = "Детка, твои родители случайно не фриганы?" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = banana.Id, ToId = berry.Id, Text = "Эм... Нет" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = berry.Id, ToId = banana.Id, Text = "Хм, странно. Тогда что вы делаете в помойке?:D" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cherry.Id, ToId = apple.Id, Text = "Мне позвонили из рая и сказали, что пропал самый красивый ангел. Но не бойся, я тебя не выдал!:*" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cherry.Id, ToId = banana.Id, Text = "Я тащусь от тебя как приора по асфальту!" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cherry.Id, ToId = orange.Id, Text = "Дэвушка, закройте глаза. Что вы видите?" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = orange.Id, ToId = cherry.Id, Text = "Ничего" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cherry.Id, ToId = orange.Id, Text = "Именно. Вот так выглядит моя жизнь без тебя...." });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cherry.Id, ToId = cooky.Id, Text = "Купи гараж" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cooky.Id, ToId = cherry.Id, Text = "Все могут сказать купи гараж. А ты купи гараж" });
-    db.Messages.Add(new Message() { Date = new DateTime(), FromId = cherry.Id, ToId = cooky.Id, Text = "Ладно. Я говорил, что твоя ава тебе очень подходит?)" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = demo.Id, ToId = demo1.Id, Text = "Привет demo1" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = demo.Id, ToId = demo2.Id, Text = "Привет demo2" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = demo1.Id, ToId = demo.Id, Text = "Привет demo" });
+                                           
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = banana.Id, ToId = cooky.Id, Text = "Чао, персик, дозревай" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cherry.Id, ToId = berry.Id, Text = "Я поменял пол" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = berry.Id, ToId = cherry.Id, Text = "Какой пол?" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cherry.Id, ToId = berry.Id, Text = "ЛАМИНАААААААААААААААТ" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cooky.Id, ToId = banana.Id, Text = "Классный трек. Послухай вмести со мной и моими братками" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = orange.Id, ToId = apple.Id, Text = "Почему у меня нет друзей? Мне так одиноко..." });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = apple.Id, ToId = orange.Id, Text = "Не знаю... Может тебе стоит поменять полы?:D" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = orange.Id, ToId = apple.Id, Text = "......." });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = banana.Id, ToId = demo.Id, Text = "Докажи что ты не кремлебот" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = demo.Id, ToId = banana.Id, Text = "Олег занят, перезвоните позднее....." });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = apple.Id, ToId = cooky.Id, Text = "Тут не занято?) Я подсяду? Скинть домашку по матеше пж:X" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cooky.Id, ToId = apple.Id, Text = "Какую домашку, предурок? Тебе завтра на работу. А ну-ка ноги в руки и пошел чистить унитаз" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cherry.Id, ToId = berry.Id, Text = "Эй, сп, семки есть? А если найду?" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = berry.Id, ToId = cherry.Id, Text = "Ты шо, опять до 6 утра аниме пялил?" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cherry.Id, ToId = berry.Id, Text = "Да, вчера посмотрел токийского гуля, теперь я дед инсайд" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = berry.Id, ToId = cherry.Id, Text = "Ты не дед, максимум дебил" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = berry.Id, ToId = banana.Id, Text = "Детка, твои родители случайно не фриганы?" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = banana.Id, ToId = berry.Id, Text = "Эм... Нет" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = berry.Id, ToId = banana.Id, Text = "Хм, странно. Тогда что вы делаете в помойке?:D" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cherry.Id, ToId = apple.Id, Text = "Мне позвонили из рая и сказали, что пропал самый красивый ангел. Но не бойся, я тебя не выдал!:*" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cherry.Id, ToId = banana.Id, Text = "Я тащусь от тебя как приора по асфальту!" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cherry.Id, ToId = orange.Id, Text = "Дэвушка, закройте глаза. Что вы видите?" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = orange.Id, ToId = cherry.Id, Text = "Ничего" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cherry.Id, ToId = orange.Id, Text = "Именно. Вот так выглядит моя жизнь без тебя...." });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cherry.Id, ToId = cooky.Id, Text = "Купи гараж" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cooky.Id, ToId = cherry.Id, Text = "Все могут сказать купи гараж. А ты купи гараж" });
+    db.Messages.Add(new Message() { Date = DateTime.Now, FromId = cherry.Id, ToId = cooky.Id, Text = "Ладно. Я говорил, что твоя ава тебе очень подходит?)" });
 
     db.SaveChanges();
 }

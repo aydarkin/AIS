@@ -85,8 +85,23 @@ namespace Back.Controllers
                 if (item.BirthDate != null)
                     editable.BirthDate = item.BirthDate;
 
-                if (item.CityId != null)
-                    editable.CityId = item.CityId;
+                if (item.CityId != null || item.City != null)
+                    editable.CityId = item.CityId ?? item.City?.Id;
+
+                if (item.GenderId != null || item.Gender != null)
+                    editable.GenderId = item.GenderId ?? item.Gender?.Id;
+
+                if (item.Interests != null)
+                {
+                    db.Persons.Include(x => x.Interests).ToList();
+                    editable.Interests.Clear();
+                    db.SaveChanges();
+                    foreach (var newInterest in item.Interests)
+                    {
+                        editable.Interests.Add(db.Interests.Find(newInterest.Id));
+                    }
+                }
+                    
 
                 db.SaveChanges();
             }
