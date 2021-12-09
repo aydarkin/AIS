@@ -3,7 +3,7 @@
     class="content-auth is-flex is-justify-content-center is-align-items-center"
   >
     <div class="card form is-flex is-justify-content-center is-flex-wrap-wrap p-4">
-      <p class="subtitle is-5">Чтобы войти введите логин и пароль</p>
+      <p class="title is-5">Авторизация</p>
       <b-field label="Логин" class="form__input">
         <b-input v-model="login" required/>
       </b-field>

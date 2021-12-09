@@ -17,15 +17,20 @@ namespace Back.Controllers
             User user;
             using (var db = new AppDBContext())
             {
+                var exist = db.Users.Any(u => u.Login == item.Login);
+                if (exist)
+                    return BadRequest(new { errorText = "Неправильный логин или пароль" });
+
                 user = db.Users.Add(item).Entity;
                 db.SaveChanges();
 
                 db.Persons.Add(new Person() { UserId = user.Id, Name = "Новый пользователь" });
+                db.SaveChanges();
             }
 
             return user;
         }
-
+        
         [HttpPost("auth")]
         public ActionResult<object> Token([FromBody] User item)
         {
