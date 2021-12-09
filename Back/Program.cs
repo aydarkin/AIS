@@ -110,7 +110,7 @@ using (var db = new AppDBContext())
 
     var demo = new User() { Login = "demo", Password = "demo" };
     db.Users.Add(demo);
-    db.Persons.Add(new Person() { Name = "Демо", Surname = "Иванов", User = demo, GenderId = 1, City = cityUfa });
+    db.Persons.Add(new Person() { Name = "Демо", Surname = "Иванов", User = demo, GenderId = 1, City = cityUfa, BirthDate = new DateTime(1999, 7, 5) });
 
     var demo1 = new User() { Login = "demo1", Password = "demo1" };
     db.Users.Add(demo1);
@@ -127,32 +127,32 @@ using (var db = new AppDBContext())
 
     var banana = new User() { Login = "banana", Password = "banana" };
     db.Users.Add(banana);
-    db.Persons.Add(new Person() { Surname = "Клубничка", Name = "Елена", Patronymic = "Антоновна", User = banana, GenderId = 2, City =  cityMinsk});
+    db.Persons.Add(new Person() { Surname = "Клубничка", Name = "Елена", Patronymic = "Антоновна", User = banana, GenderId = 2, City =  cityMinsk, BirthDate = new DateTime(1998,6,15)});
     db.Friendships.Add(new Friendship() { First = demo1.Person, Second = banana.Person, Direction = FriendDirection.Both });
 
     var cherry = new User() { Login = "cherry", Password = "cherry" };
     db.Users.Add(cherry);
-    db.Persons.Add(new Person() { Surname = "Бикини", Name = "Григорий", Patronymic = "Версальевич", User = cherry, GenderId = 1, City = cityUfa });
+    db.Persons.Add(new Person() { Surname = "Бикини", Name = "Григорий", Patronymic = "Версальевич", User = cherry, GenderId = 1, City = cityUfa, BirthDate = new DateTime(2000, 9, 25) });
     db.Friendships.Add(new Friendship() { First = banana.Person, Second = cherry.Person, Direction = FriendDirection.SecondToFirst });
 
     var cooky = new User() { Login = "cooky", Password = "cooky" };
     db.Users.Add(cooky);
-    db.Persons.Add(new Person() { Surname = "Чебурашко", Name = "Анатолий", Patronymic = "Генадьевич", User = cooky, GenderId = 1, City = cityKiev });
+    db.Persons.Add(new Person() { Surname = "Чебурашко", Name = "Анатолий", Patronymic = "Генадьевич", User = cooky, GenderId = 1, City = cityKiev, BirthDate = new DateTime(2002, 12, 1) });
     db.Friendships.Add(new Friendship() { First = banana.Person, Second = cooky.Person, Direction = FriendDirection.Both });
 
     var apple = new User() { Login = "apple", Password = "apple" };
     db.Users.Add(apple);
-    db.Persons.Add(new Person() { Surname = "Мармышкина", Name = "Апполинария", Patronymic = "Вадимановна", User = apple, GenderId = 2, City = cityKiev });
+    db.Persons.Add(new Person() { Surname = "Мармышкина", Name = "Апполинария", Patronymic = "Вадимановна", User = apple, GenderId = 2, City = cityKiev, BirthDate = new DateTime(1995, 6, 11) });
     db.Friendships.Add(new Friendship() { First = apple.Person, Second = cooky.Person, Direction = FriendDirection.FirstToSecond });
 
     var orange = new User() { Login = "orange", Password = "orange" };
     db.Users.Add(orange);
-    db.Persons.Add(new Person() { Surname = "Скайримовна", Name = "Валерия", Patronymic = "Даваковна", User = orange, GenderId = 2, City = cityMinsk });
+    db.Persons.Add(new Person() { Surname = "Скайримовна", Name = "Валерия", Patronymic = "Даваковна", User = orange, GenderId = 2, City = cityMinsk, BirthDate = new DateTime(2001, 5, 20) });
     db.Friendships.Add(new Friendship() { First = orange.Person, Second = apple.Person, Direction = FriendDirection.Both });
 
     var berry = new User() { Login = "berry", Password = "berry" };
     db.Users.Add(berry);
-    db.Persons.Add(new Person() { Surname = "Корейка", Name = "Олег", Patronymic = "Марийевич", User = berry, GenderId = 3, City = cityUfa });
+    db.Persons.Add(new Person() { Surname = "Корейка", Name = "Олег", Patronymic = "Марийевич", User = berry, GenderId = 3, City = cityUfa, BirthDate = new DateTime(1996, 4, 7) });
     db.Friendships.Add(new Friendship() { First = berry.Person, Second = banana.Person, Direction = FriendDirection.FirstToSecond });
 
     var interest1 = new Interest() { Title = "Книги" };
