@@ -15,11 +15,11 @@ namespace Back.Controllers
             using (var db = new AppDBContext())
             {
                 persons = db.Persons
+                    .Include(x => x.Interests)
                     .Include(x => x.Avatar)
                     .Include(x => x.Gender)
                     .Include(x => x.City)
                     .Include("City.Country")
-                    .Include(x => x.Interests)
                     .ToList();
             }
             return persons;
@@ -31,6 +31,7 @@ namespace Back.Controllers
             Person person;
             using (var db = new AppDBContext())
             {
+                db.Persons.Include(x => x.Interests).ToList();
                 person = db.Persons.Find(id);
 
                 if (person.GenderId != null)
@@ -38,6 +39,7 @@ namespace Back.Controllers
 
                 if (person.CityId != null)
                     db.Cities.Where(c => c.Id == person.CityId).Load();
+                
             }
             if (person == null)
                 return NotFound();

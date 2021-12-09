@@ -89,14 +89,15 @@ using (var db = new AppDBContext())
     db.Countries.Add(new Country() { Title = "Украина" });
     db.Countries.Add(new Country() { Title = "Казахстан" });
 
-    db.Cities.Add(new City() { Title = "Уфа", Country = rf });
+    var cityUfa = new City() { Title = "Уфа", Country = rf };
+    db.Cities.Add(cityUfa);
     db.Cities.Add(new City() { Title = "Москва", Country = rf });
     db.Cities.Add(new City() { Title = "Чишмы", Country = rf });
     db.Cities.Add(new City() { Title = "Туймазы", Country = rf });
 
     var demo = new User() { Login = "demo", Password = "demo" };
     db.Users.Add(demo);
-    db.Persons.Add(new Person() { Name = "Демо", Surname = "Иванов", User = demo });
+    db.Persons.Add(new Person() { Name = "Демо", Surname = "Иванов", User = demo, GenderId = 1, City = cityUfa });
 
     var demo1 = new User() { Login = "demo1", Password = "demo1" };
     db.Users.Add(demo1);
@@ -111,6 +112,19 @@ using (var db = new AppDBContext())
 
     var newUser = new User() { Login = "new", Password = "new" };
     db.Persons.Add(new Person() { Name = "Новый пользователь", User = newUser });
+
+    var interest1 = new Interest() { Title = "Книги" };
+    var interest2 = new Interest() { Title = "Музыка" };
+    var interest3 = new Interest() { Title = "Кинофильмы" };
+    var interest4 = new Interest() { Title = "Танцы" };
+    var interest5 = new Interest() { Title = "Видеоигры" };
+    db.Interests.Add(interest1);
+    db.Interests.Add(interest2);
+    db.Interests.Add(interest4);
+    db.Interests.Add(interest5);
+    demo.Person.Interests.Add(interest1);
+    demo.Person.Interests.Add(interest2);
+
     db.SaveChanges();
 
     db.Messages.Add(new Message() { Date = new DateTime(), FromId = demo.Id, ToId = demo1.Id, Text = "Привет demo1" });
