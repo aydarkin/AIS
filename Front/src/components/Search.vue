@@ -4,25 +4,26 @@
       class="
         card
         search-interlocutor
-        is-flex is-flex-wrap-wrap is-justify-content-space-around
+        is-flex is-flex-wrap-wrap is-justify-content-center
         pt-2
         pb-2
       "
     >
-      <b-field class="search-interlocutor__input">
-        <b-input
-          placeholder="Найти друга по ФИО"
-          v-model="selected"
-          icon="search"
-          icon-pack="fas"
-          :icon-right="selected ? 'times-circle' : ''"
-          icon-right-clickable
-          @icon-right-click="clearSearch"
-          trap-focus
-        >
-        </b-input>
-      </b-field>
-      <b-button type="is-danger">Найти</b-button>
+      <div class="is-flex is-flex-wrap-wrap is-justify-content-center is-flex-grow-1 p-4">
+         <b-input
+            placeholder="Найти друга по ФИО"
+            v-model="selected"
+            icon="search"
+            icon-pack="fas"
+            :icon-right="selected ? 'times-circle' : ''"
+            icon-right-clickable
+            @icon-right-click="clearSearch"
+            trap-focus
+            class="search-interlocutor__input mr-4 is-flex-grow-1"
+          >
+          </b-input>
+        <b-button type="is-danger">Найти</b-button>
+      </div>
       <div
         class="
           search-interlocutor__group
@@ -35,21 +36,28 @@
           class="
             person__group
             is-flex is-flex-wrap-nowrap is-justify-content-start
+            p-2
           "
         >
-          <div class="is-flex is-flex-wrap-nowrap is-justify-content-center">
-            <figure class="image is-64x64 mr-3">
+          <div
+            class="
+              person__info
+              is-flex is-flex-wrap-nowrap is-justify-content-start
+            "
+          >
+            <figure class="image is-64x64 mr-3 is-flex is-align-self-center">
               <img src="@/assets/person.png" />
             </figure>
-            <p
+            <div
               class="
-                person__name person__name-size
-                is-flex is-flex is-align-self-center
+                is-flex is-flex is-align-self-center is-flex is-flex-wrap-nowrap
               "
             >
-              {{ interlocutor.surname }} {{ interlocutor.name }}
-              {{ interlocutor.patronymic }}
-            </p>
+              <div class="person__name person__name-size">
+                {{ interlocutor.surname }} {{ interlocutor.name }}
+                {{ interlocutor.patronymic }}
+              </div>
+            </div>
           </div>
           <b-button type="is-danger is-light is-flex is-align-self-center"
             >Отправить заявку</b-button
@@ -79,7 +87,7 @@
           class="
             person__group
             is-flex is-flex-wrap-nowrap is-justify-content-space-center
-            pb-5
+            p-2
           "
         >
           <figure class="image is-128x128 is-flex is-align-self-center">
@@ -190,6 +198,7 @@ export default Vue.extend({
 <style>
 .search-interlocutor {
   width: 40%;
+  gap: 10px;
 }
 
 .recommendation-interlocutor {
@@ -197,11 +206,12 @@ export default Vue.extend({
 }
 
 .search-interlocutor__input {
-  width: 70%;
+  
 }
 
 .person__group {
   width: 90%;
+  gap: 10px;
 }
 
 .search-interlocutor__group,
@@ -209,7 +219,11 @@ export default Vue.extend({
   width: 100%;
 }
 
+.person__info {
+  width: 100%;
+}
+
 .person__name-size {
-  width: 240px;
+  width: 18vw;
 }
 </style>
