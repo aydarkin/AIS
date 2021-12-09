@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="loaded"
     class="
       is-flex is-flex-wrap-nowrap is-justify-content-space-around
       mb-5
@@ -10,13 +11,13 @@
       <b-tabs vertical :animated="false" type="is-boxed">
         <b-tab-item label="О себе">
           <b-field label="Фамилия">
-            <b-input placeholder="Введите вашу фамилию"></b-input>
+            <b-input placeholder="Введите вашу фамилию" v-model="profile.surname"></b-input>
           </b-field>
           <b-field label="Имя">
-            <b-input placeholder="Введите ваше имя"></b-input>
+            <b-input placeholder="Введите ваше имя" v-model="profile.name"></b-input>
           </b-field>
           <b-field label="Отчество">
-            <b-input placeholder="Введите ваше отчество"></b-input>
+            <b-input placeholder="Введите ваше отчество" v-model="profile.patronymic"></b-input>
           </b-field>
           <b-field label="Пол">
             <b-radio v-model="radio" name="name" native-value="Мужской">
@@ -76,7 +77,7 @@
                   <figure class="image is-48x48">
                     <img src="@/assets/person.png" />
                   </figure>
-                  <p class="person__name is-size-7">{{ friend.name }}</p>
+                  <p class="person__name is-size-7" :title="friend.name">{{ friend.name }}</p>
                 </div>
               </div>
               <b-button type="is-primary is-align-self-flex-end"
@@ -98,7 +99,7 @@
                   <figure class="image is-48x48">
                     <img src="@/assets/person.png" />
                   </figure>
-                  <p class="person__name is-size-7">{{ subscriber.name }}</p>
+                  <p class="person__name is-size-7" :title="subscriber.name">{{ subscriber.name }}</p>
                 </div>
               </div>
               <b-button type="is-primary is-align-self-flex-end"
@@ -120,7 +121,7 @@
                   <figure class="image is-48x48">
                     <img src="@/assets/person.png" />
                   </figure>
-                  <p class="person__name is-size-7">{{ subscription.name }}</p>
+                  <p class="person__name is-size-7" :title="subscription.name">{{ subscription.name }}</p>
                 </div>
               </div>
               <b-button type="is-primary is-align-self-flex-end"
@@ -178,6 +179,9 @@
 
 <script lang="ts">
 import Vue from "vue";
+import Profile from "../utils/Profile";
+import Data from "../utils/Data";
+import Cookie from "@/utils/Cookie";
 
 interface IState {
   selectedDate?: Date | null;
@@ -192,6 +196,10 @@ interface IInterest {
 export default Vue.extend({
   data() {
     return {
+      // флаг загрузки
+      loaded: false,
+      profile: undefined,
+
       selectedDate: new Date(),
       showWeekNumber: false,
       locale: undefined, // Browser localeS
@@ -199,81 +207,104 @@ export default Vue.extend({
       selectedTags: [],
       tags: undefined,
       friends: [
-        {
-          id: 0,
-          surname: "Иванов",
-          name: "Иван",
-          patronymic: "Иванович",
-          img: "`@/assets/person.png`",
-        },
-        {
-          id: 1,
-          surname: "Петров",
-          name: "Петр",
-          patronymic: "Петрович",
-          img: "`@/assets/person.png`",
-        },
+        // {
+        //   id: 0,
+        //   surname: "Иванов",
+        //   name: "Иван",
+        //   patronymic: "Иванович",
+        //   img: "`@/assets/person.png`",
+        // },
+        // {
+        //   id: 1,
+        //   surname: "Петров",
+        //   name: "Петр",
+        //   patronymic: "Петрович",
+        //   img: "`@/assets/person.png`",
+        // },
       ],
       subscribers: [
-        {
-          id: 0,
-          surname: "Викторов",
-          name: "Виктор",
-          patronymic: "Викторович",
-          img: "@/assets/person.png",
-        },
-        {
-          id: 1,
-          surname: "Александров",
-          name: "Алексей",
-          patronymic: "Александрович",
-          img: "@/assets/person.png",
-        },
-        {
-          id: 2,
-          surname: "Иванов",
-          name: "Иван",
-          patronymic: "Иванович",
-          img: "@/assets/person.png",
-        },
+        // {
+        //   id: 0,
+        //   surname: "Викторов",
+        //   name: "Виктор",
+        //   patronymic: "Викторович",
+        //   img: "@/assets/person.png",
+        // },
+        // {
+        //   id: 1,
+        //   surname: "Александров",
+        //   name: "Алексей",
+        //   patronymic: "Александрович",
+        //   img: "@/assets/person.png",
+        // },
+        // {
+        //   id: 2,
+        //   surname: "Иванов",
+        //   name: "Иван",
+        //   patronymic: "Иванович",
+        //   img: "@/assets/person.png",
+        // },
       ],
       subscriptions: [
-        {
-          id: 0,
-          surname: "Викторов",
-          name: "Виктор",
-          patronymic: "Викторович",
-          img: "@/assets/person.png",
-        },
-        {
-          id: 1,
-          surname: "Александров",
-          name: "Алексей",
-          patronymic: "Александрович",
-          img: "@/assets/person.png",
-        },
-        {
-          id: 2,
-          surname: "Иванов",
-          name: "Иван",
-          patronymic: "Иванович",
-          img: "@/assets/person.png",
-        },
+        // {
+        //   id: 0,
+        //   surname: "Викторов",
+        //   name: "Виктор",
+        //   patronymic: "Викторович",
+        //   img: "@/assets/person.png",
+        // },
+        // {
+        //   id: 1,
+        //   surname: "Александров",
+        //   name: "Алексей",
+        //   patronymic: "Александрович",
+        //   img: "@/assets/person.png",
+        // },
+        // {
+        //   id: 2,
+        //   surname: "Иванов",
+        //   name: "Иван",
+        //   patronymic: "Иванович",
+        //   img: "@/assets/person.png",
+        // },
       ],
     } as IState;
   },
-  created() {
-    // mock
-    this.tags = [
-      { id: 0, title: "Книги" },
-      { id: 1, title: "Кинофильмы" },
-      { id: 2, title: "Музыка" },
-    ];
-    this.filteredTags = this.tags;
+  async created() {
+    const myId = Cookie.getCookie('userId');
+
+    const promises = [];
+    promises.push(Profile.model);
+    promises.push(Data.getQuery('friendship/' + myId));
+
+    const [profile, friendship] = await Promise.all(promises);
+    this.profile = profile;
+    if (profile.birthDate) {
+      this.selectedDate = new Date(profile.birthDate)
+    }
+    
+    this.tags = profile.interests 
+    // [
+    //   { id: 0, title: "Книги" },
+    //   { id: 1, title: "Кинофильмы" },
+    //   { id: 2, title: "Музыка" },
+    // ];
+    this.filteredTags = this.tags;    
+
+    this.friends = friendship.filter((f: any) => f.direction == 2)
+      .map((f: any) => f.firstId == myId ? f.second : f.first);
+
+    this.subscribers = friendship.filter((f: any) => f.firstId == myId && f.direction == 1 || f.secondId == myId && f.direction == 0)
+      .map((f: any) => f.firstId == myId ? f.second : f.first);
+
+    this.subscriptions = friendship.filter((f: any) => f.firstId == myId && f.direction == 0 || f.secondId == myId && f.direction == 1)
+      .map((f: any) => f.firstId == myId ? f.second : f.first);
+
+    // флаг для отрисовки всего
+    this.loaded = true;
   },
   watch: {
-    // call again the method if the route changes
-    $route: "fetchData",
+    
   },
   methods: {
     clearDate(): void {

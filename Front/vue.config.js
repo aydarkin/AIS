@@ -24,8 +24,9 @@ module.exports = {
         //     cert: fs.readFileSync(certFilePath),
         // },
         proxy: {
-            '^/weatherforecast': {
-                target: 'https://localhost:5001/'
+            '^/api': {
+                target: 'http://localhost:5001/',
+                secure: false
             }
         },
         port: 5002

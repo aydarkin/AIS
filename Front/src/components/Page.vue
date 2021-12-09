@@ -18,7 +18,7 @@
       <template #end>
         <b-navbar-item tag="div">
           <div class="buttons">
-            <a class="button is-danger">
+            <a class="button is-danger" @click="exit">
               <strong>Выйти</strong>
             </a>
           </div>
@@ -60,6 +60,11 @@ export default Vue.extend({
     route(page: TPage): void {
       this.$emit("pageChange", page);
     },
+
+    exit() {
+      document.cookie = 'token=;userId=';
+      this.$router.push('/auth');
+    }
   },
 });
 </script>

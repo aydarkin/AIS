@@ -96,7 +96,7 @@ using (var db = new AppDBContext())
 
     var demo = new User() { Login = "demo", Password = "demo" };
     db.Users.Add(demo);
-    db.Persons.Add(new Person() { Name = "Демо пользователь", User = demo });
+    db.Persons.Add(new Person() { Name = "Демо", Surname = "Иванов", User = demo });
 
     var demo1 = new User() { Login = "demo1", Password = "demo1" };
     db.Users.Add(demo1);
@@ -109,8 +109,8 @@ using (var db = new AppDBContext())
     db.Persons.Add(new Person() { Name = "Друг", User = demo2 });
     db.Friendships.Add(new Friendship() { First = demo.Person, Second = demo2.Person, Direction = FriendDirection.Both });
 
-
-    db.Users.Add(new User() { Login = "new", Password = "new" });
+    var newUser = new User() { Login = "new", Password = "new" };
+    db.Persons.Add(new Person() { Name = "Новый пользователь", User = newUser });
     db.SaveChanges();
 
     db.Messages.Add(new Message() { Date = new DateTime(), FromId = demo.Id, ToId = demo1.Id, Text = "Привет demo1" });
@@ -126,12 +126,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI((options) =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "our super API v1");
-        options.RoutePrefix = string.Empty;
+        //options.SwaggerEndpoint("/swagger/v1/swagger.json", "our super API v1");
+        //options.RoutePrefix = string.Empty;
     });
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthentication();

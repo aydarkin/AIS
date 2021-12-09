@@ -33,8 +33,11 @@ namespace Back.Controllers
             {
                 person = db.Persons.Find(id);
 
-                db.Genders.Where(c => c.Id == person.GenderId).Load();
-                db.Cities.Where(c => c.Id == person.CityId).Load();
+                if (person.GenderId != null)
+                    db.Genders.Where(c => c.Id == person.GenderId).Load();
+
+                if (person.CityId != null)
+                    db.Cities.Where(c => c.Id == person.CityId).Load();
             }
             if (person == null)
                 return NotFound();

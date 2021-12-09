@@ -19,6 +19,8 @@ namespace Back.Controllers
             {
                 user = db.Users.Add(item).Entity;
                 db.SaveChanges();
+
+                db.Persons.Add(new Person() { UserId = user.Id, Name = "Новый пользователь" });
             }
 
             return user;
@@ -47,11 +49,11 @@ namespace Back.Controllers
             var response = new
             {
                 access_token = encodedJwt,
-                username = identity.Name
+                userId = identity.Name
             };
 
             this.Response.Cookies.Append("token", encodedJwt);
-            this.Response.Cookies.Append("username", identity.Name ?? "");
+            this.Response.Cookies.Append("userId", identity.Name ?? "");
 
             return response;
         }
@@ -69,7 +71,7 @@ namespace Back.Controllers
             {
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login)
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.Id.ToString())
                 };
 
                 return new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
