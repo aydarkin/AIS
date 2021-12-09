@@ -11,19 +11,28 @@
       <b-tabs vertical :animated="false" type="is-boxed">
         <b-tab-item label="О себе">
           <b-field label="Фамилия">
-            <b-input placeholder="Введите вашу фамилию" v-model="profile.surname"></b-input>
+            <b-input
+              placeholder="Введите вашу фамилию"
+              v-model="profile.surname"
+            ></b-input>
           </b-field>
           <b-field label="Имя">
-            <b-input placeholder="Введите ваше имя" v-model="profile.name"></b-input>
+            <b-input
+              placeholder="Введите ваше имя"
+              v-model="profile.name"
+            ></b-input>
           </b-field>
           <b-field label="Отчество">
-            <b-input placeholder="Введите ваше отчество" v-model="profile.patronymic"></b-input>
+            <b-input
+              placeholder="Введите ваше отчество"
+              v-model="profile.patronymic"
+            ></b-input>
           </b-field>
           <b-field label="Пол">
-            <b-radio v-model="radio" name="name" native-value="Мужской">
+            <b-radio v-model="profile.genderId" name="name" native-value="1">
               Мужской
             </b-radio>
-            <b-radio v-model="radio" name="name" native-value="Женский">
+            <b-radio v-model="profile.genderId" name="name" native-value="2">
               Женский
             </b-radio>
           </b-field>
@@ -43,24 +52,15 @@
             >
             </b-datepicker>
           </b-field>
-          <b-button type="is-danger">Сохранить</b-button>
         </b-tab-item>
         <b-tab-item label="Местожительство">
-          <b-field label="Страна">
-            <b-select
-              expanded
-              v-model="type"
-              placeholder="Выберите свою страну"
-            >
-              <option>Россия</option>
-            </b-select>
-          </b-field>
           <b-field label="Город">
             <b-select expanded v-model="type" placeholder="Выберите свой город">
-              <option>Туймазы</option>
+              <option v-for="city in cities" v-bind:key="city.id" :value="city.id">
+                {{`${city.title} (${city.country.title})`}}
+              </option>
             </b-select>
           </b-field>
-          <b-button type="is-danger">Сохранить</b-button>
         </b-tab-item>
         <b-tab-item label="Мои друзья">
           <b-field label="Друзья">
@@ -77,7 +77,9 @@
                   <figure class="image is-48x48">
                     <img src="@/assets/person.png" />
                   </figure>
-                  <p class="person__name is-size-7" :title="friend.name">{{ friend.name }}</p>
+                  <p class="person__name is-size-7" :title="friend.name">
+                    {{ friend.name }}
+                  </p>
                 </div>
               </div>
               <b-button type="is-primary is-align-self-flex-end"
@@ -99,7 +101,9 @@
                   <figure class="image is-48x48">
                     <img src="@/assets/person.png" />
                   </figure>
-                  <p class="person__name is-size-7" :title="subscriber.name">{{ subscriber.name }}</p>
+                  <p class="person__name is-size-7" :title="subscriber.name">
+                    {{ subscriber.name }}
+                  </p>
                 </div>
               </div>
               <b-button type="is-primary is-align-self-flex-end"
@@ -121,7 +125,9 @@
                   <figure class="image is-48x48">
                     <img src="@/assets/person.png" />
                   </figure>
-                  <p class="person__name is-size-7" :title="subscription.name">{{ subscription.name }}</p>
+                  <p class="person__name is-size-7" :title="subscription.name">
+                    {{ subscription.name }}
+                  </p>
                 </div>
               </div>
               <b-button type="is-primary is-align-self-flex-end"
@@ -146,7 +152,6 @@
             >
             </b-taginput>
           </b-field>
-          <b-button type="is-danger">Сохранить</b-button>
         </b-tab-item>
       </b-tabs>
     </div>
@@ -161,18 +166,40 @@
       <div class="card-content">
         <div class="media">
           <div class="media-content is-flex is-justify-content-center">
-            <p class="title is-4">ФИО</p>
+            <p class="title is-4">
+              {{ profile.surname }} {{ profile.name }} {{ profile.patronymic }}
+            </p>
           </div>
         </div>
         <div
           class="content is-flex is-flex-direction-column is-align-items-center"
         >
           <span>Страна - Город</span>
-          <span>Пол</span>
-          <span>Возраст</span>
-          <span>Интересы</span>
+          <span>{{
+            profile.genderId == 2 ? "Пол - женский" : "Пол - мужской"
+          }}</span>
+          <span v-if="this.selectedDate"
+            >Возраст - {{ ageToStr(getAge(this.selectedDate)) }}</span
+          >
+          <div
+            class="
+              content__interests
+              is-flex
+              is-flex-direction-column
+              is-align-items-center
+              is-flex-wrap-wrap
+            "
+          >
+            <div>Интересы:</div>
+            <div class="interests__interest is-flex is-justify-content-center">
+              <p v-for="interest in profile.interests" v-bind:key="interest.id">
+                {{ interest.title }}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
+      <b-button type="is-danger" class="m-5">Сохранить</b-button>
     </div>
   </div>
 </template>
@@ -199,8 +226,8 @@ export default Vue.extend({
       // флаг загрузки
       loaded: false,
       profile: undefined,
-
-      selectedDate: new Date(),
+      cities: [],
+      selectedDate: null,
       showWeekNumber: false,
       locale: undefined, // Browser localeS
       filteredTags: undefined,
@@ -271,43 +298,59 @@ export default Vue.extend({
     } as IState;
   },
   async created() {
-    const myId = Cookie.getCookie('userId');
+    const myId = Cookie.getCookie("userId");
 
     const promises = [];
     promises.push(Profile.model);
-    promises.push(Data.getQuery('friendship/' + myId));
+    promises.push(Data.getQuery("friendship/" + myId));
+    promises.push(Data.getQuery("interest"));
+    promises.push(Data.getQuery("city"));
 
-    const [profile, friendship] = await Promise.all(promises);
+    const [profile, friendship, allInterests, allcities] = await Promise.all(
+      promises
+    );
     this.profile = profile;
     if (profile.birthDate) {
-      this.selectedDate = new Date(profile.birthDate)
+      this.selectedDate = new Date(profile.birthDate);
     }
-    
-    this.tags = profile.interests 
+
+    this.selectedTags = profile.interests;
+    this.tags = allInterests;
+    this.cities = allcities;
     // [
     //   { id: 0, title: "Книги" },
     //   { id: 1, title: "Кинофильмы" },
     //   { id: 2, title: "Музыка" },
     // ];
-    this.filteredTags = this.tags;    
 
-    this.friends = friendship.filter((f: any) => f.direction == 2)
-      .map((f: any) => f.firstId == myId ? f.second : f.first);
+    this.friends = friendship
+      .filter((f: any) => f.direction == 2)
+      .map((f: any) => (f.firstId == myId ? f.second : f.first));
 
-    this.subscribers = friendship.filter((f: any) => f.firstId == myId && f.direction == 1 || f.secondId == myId && f.direction == 0)
-      .map((f: any) => f.firstId == myId ? f.second : f.first);
+    this.subscribers = friendship
+      .filter(
+        (f: any) =>
+          (f.firstId == myId && f.direction == 1) ||
+          (f.secondId == myId && f.direction == 0)
+      )
+      .map((f: any) => (f.firstId == myId ? f.second : f.first));
 
-    this.subscriptions = friendship.filter((f: any) => f.firstId == myId && f.direction == 0 || f.secondId == myId && f.direction == 1)
-      .map((f: any) => f.firstId == myId ? f.second : f.first);
+    this.subscriptions = friendship
+      .filter(
+        (f: any) =>
+          (f.firstId == myId && f.direction == 0) ||
+          (f.secondId == myId && f.direction == 1)
+      )
+      .map((f: any) => (f.firstId == myId ? f.second : f.first));
 
     // флаг для отрисовки всего
     this.loaded = true;
   },
-  watch: {
-    
-  },
+  watch: {},
   methods: {
     clearDate(): void {
+      console.log("clear");
+
       this.selectedDate = null;
     },
     getFilteredTags(text: string) {
@@ -318,6 +361,31 @@ export default Vue.extend({
           ) && interest.title.toLowerCase().indexOf(text.toLowerCase()) >= 0
         );
       });
+    },
+    getAge(dateISO: string): string {
+      const yearBirth = new Date(dateISO).getFullYear();
+      const year = new Date().getFullYear();
+      let age = (year - yearBirth).toString();
+
+      return age;
+    },
+
+    ageToStr(age: string): string {
+      let txt;
+      let count = Number(age) % 100;
+      if (count >= 5 && count <= 20) {
+        txt = "лет";
+      } else {
+        count = count % 10;
+        if (count == 1) {
+          txt = "год";
+        } else if (count >= 2 && count <= 4) {
+          txt = "года";
+        } else {
+          txt = "лет";
+        }
+      }
+      return age + " " + txt;
     },
   },
 });
@@ -348,5 +416,13 @@ export default Vue.extend({
 
 .person {
   width: 48px;
+}
+
+.content__interests,
+.interests__interest {
+  width: 100%;
+}
+.interests__interest {
+  gap: 10px;
 }
 </style>
