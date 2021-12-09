@@ -38,7 +38,7 @@ namespace Back.Controllers
                     db.Genders.Where(c => c.Id == person.GenderId).Load();
 
                 if (person.CityId != null)
-                    db.Cities.Where(c => c.Id == person.CityId).Load();
+                    db.Cities.Where(c => c.Id == person.CityId).Include("Country").Load();
                 
             }
             if (person == null)

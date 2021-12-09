@@ -173,7 +173,7 @@
         <div
           class="content is-flex is-flex-direction-column is-align-items-center"
         >
-          <span>Страна - Город</span>
+          <span v-if="profile.cityId">{{`${profile.city.country.title} - ${profile.city.title}` }}</span>
           <span>{{
             profile.genderId == 2 ? "Пол - женский" : "Пол - мужской"
           }}</span>
