@@ -9,20 +9,25 @@
         pb-2
       "
     >
-      <div class="is-flex is-flex-wrap-wrap is-justify-content-center is-flex-grow-1 p-4">
-         <b-input
-            placeholder="Найти друга по ФИО"
-            v-model="selected"
-            icon="search"
-            icon-pack="fas"
-            :icon-right="selected ? 'times-circle' : ''"
-            icon-right-clickable
-            @icon-right-click="clearSearch"
-            trap-focus
-            class="search-interlocutor__input mr-4 is-flex-grow-1"
-          >
-          </b-input>
-        <b-button type="is-danger">Найти</b-button>
+      <div
+        class="
+          is-flex is-flex-wrap-wrap is-justify-content-center is-flex-grow-1
+          p-4
+        "
+      >
+        <b-input
+          placeholder="Найти друга по ФИО"
+          v-model="selected"
+          icon="search"
+          icon-pack="fas"
+          :icon-right="selected ? 'times-circle' : ''"
+          icon-right-clickable
+          @icon-right-click="clearSearch"
+          trap-focus
+          class="search-interlocutor__input mr-4 is-flex-grow-1"
+        >
+        </b-input>
+        <b-button @click="find" type="is-danger">Найти</b-button>
       </div>
       <div
         class="
@@ -120,11 +125,15 @@
 
 <script lang="ts">
 import Vue from "vue";
+import Data from "../utils/Data";
+import Cookie from "../utils/Cookie";
 
 export default Vue.extend({
   data() {
     return {
       filteredTags: undefined,
+      myId: undefined as any,
+      selected: "",
       recommendationInterlocutors: [
         {
           id: 0,
@@ -186,12 +195,30 @@ export default Vue.extend({
       ],
     };
   },
-  created() {},
+  async created() {
+    this.myId = Cookie.getCookie("userId");
+
+    const promises = [];
+    promises.push(Data.getQuery("person", {
+      mode: "recommended",
+      id: this.myId
+    }));
+
+    // const [recommended] = await Promise.all(
+    //   promises
+    // );
+  },
   watch: {
     // call again the method if the route changes
     $route: "fetchData",
   },
-  methods: {},
+  methods: {
+    find() {
+      Data.getQuery("person", { fio: this.selected }).then((persons) => {
+        this.searchionInterlocutors = persons;
+      });
+    },
+  },
 });
 </script>
 
@@ -206,7 +233,6 @@ export default Vue.extend({
 }
 
 .search-interlocutor__input {
-  
 }
 
 .person__group {

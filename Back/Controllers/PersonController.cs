@@ -1,6 +1,7 @@
 ﻿using Back.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Back.Controllers
 {
@@ -9,18 +10,36 @@ namespace Back.Controllers
     public class PersonController : ControllerBase
     {
         [HttpGet]
-        public IEnumerable<Person> Get()
+        public IEnumerable<Person> Get(string? fio, string? mode, int? id)
         {
-            List<Person> persons;
+            IEnumerable<Person> persons;
             using (var db = new AppDBContext())
             {
+                db.Persons.Include(x => x.Interests).ToList();
                 persons = db.Persons
                     .Include(x => x.Interests)
                     .Include(x => x.Avatar)
                     .Include(x => x.Gender)
                     .Include(x => x.City)
-                    .Include("City.Country")
-                    .ToList();
+                    .Include("City.Country");
+
+                // такой себе поиск
+                if (fio != null)
+                    persons = persons.Where(x => $"{x.Surname} {x.Name} {x.Patronymic}".ToLower().Contains(fio.ToLower()));
+
+                if (mode == "recommended")
+                {
+                    var current = db.Persons.Find(id);
+                    List<int> interests = current.Interests.Select(i => i.Id ?? -1).ToList();
+
+                    persons = from x in persons
+                              where x.UserId != current.UserId
+                              orderby x.Interests.Select(i => i.Id ?? -1).Intersect(interests).ToList().Count descending
+                              select x;
+                }
+                    
+                    
+                persons = persons.Take(5).ToList();
             }
             return persons;
         }
