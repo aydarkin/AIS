@@ -19,9 +19,10 @@ namespace Back.Controllers
                     .Include(f => f.First)
                     .Include(f => f.Second)
 
-                    // в Person детализируем Gender
-                    .ThenInclude(p => p.Gender)
-                    
+                    // в Person детализируем City
+                    .ThenInclude(p => p.City)
+                    .ThenInclude(p => p.Country)
+
                     .ToList();
             }
             return friendships;
@@ -41,8 +42,9 @@ namespace Back.Controllers
                     .Include(f => f.First)
                     .Include(f => f.Second)
 
-                    // в Person детализируем Gender
-                    .ThenInclude(p => p.Gender)
+                    // в Person детализируем City
+                    .ThenInclude(p => p.City)
+                    .ThenInclude(p => p.Country)
 
                     .ToList();
             }
