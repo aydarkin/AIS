@@ -54,9 +54,17 @@
         </b-tab-item>
         <b-tab-item label="Местожительство">
           <b-field label="Город">
-            <b-select expanded v-model="profile.cityId" placeholder="Выберите свой город">
-              <option v-for="city in cities" v-bind:key="city.id" :value="city.id">
-                {{`${city.title} (${city.country.title})`}}
+            <b-select
+              expanded
+              v-model="profile.cityId"
+              placeholder="Выберите свой город"
+            >
+              <option
+                v-for="city in cities"
+                v-bind:key="city.id"
+                :value="city.id"
+              >
+                {{ `${city.title} (${city.country.title})` }}
               </option>
             </b-select>
           </b-field>
@@ -65,11 +73,9 @@
           <b-field label="Друзья">
             <div class="notification is-flex is-justify-content-space-between">
               <div class="is-flex is-flex-wrap-nowrap person__group">
-                <div v-if="!friends.length">
-                  Друзей нет
-                </div>
+                <div v-if="!friends.length">Друзей нет</div>
                 <div
-                  v-for="friend in friends"
+                  v-for="friend in friendsCrop"
                   v-bind:key="friend.id"
                   class="
                     person
@@ -84,7 +90,10 @@
                   </p>
                 </div>
               </div>
-              <b-button v-if="friends.length > 4" type="is-primary is-align-self-flex-end"
+              <b-button
+                v-if="friends.length > 4"
+                type="is-primary is-align-self-flex-end"
+                @click="showMoreFriends('friends')"
                 >Показать еще</b-button
               >
             </div>
@@ -92,11 +101,9 @@
           <b-field label="Подписчики">
             <div class="notification is-flex is-justify-content-space-between">
               <div class="is-flex is-flex-wrap-nowrap person__group">
-                <div v-if="!subscribers.length">
-                  Подписчиков нет
-                </div>
+                <div v-if="!subscribers.length">Подписчиков нет</div>
                 <div
-                  v-for="subscriber in subscribers"
+                  v-for="subscriber in subscribersCrop"
                   v-bind:key="subscriber.id"
                   class="
                     person
@@ -111,7 +118,10 @@
                   </p>
                 </div>
               </div>
-              <b-button v-if="subscribers.length > 4" type="is-primary is-align-self-flex-end"
+              <b-button
+                v-if="subscribers.length > 4"
+                type="is-primary is-align-self-flex-end"
+                @click="showMoreFriends('subscribers')"
                 >Показать еще</b-button
               >
             </div>
@@ -119,11 +129,9 @@
           <b-field label="Подписки">
             <div class="notification is-flex is-justify-content-space-between">
               <div class="is-flex is-flex-wrap-nowrap person__group">
-                <div v-if="!subscriptions.length">
-                  Подписок нет
-                </div>
+                <div v-if="!subscriptions.length">Подписок нет</div>
                 <div
-                  v-for="subscription in subscriptions"
+                  v-for="subscription in subscriptionsCrop"
                   v-bind:key="subscription.id"
                   class="
                     person
@@ -138,7 +146,10 @@
                   </p>
                 </div>
               </div>
-              <b-button v-if="subscriptions.length > 4" type="is-primary is-align-self-flex-end" 
+              <b-button
+                v-if="subscriptions.length > 4"
+                type="is-primary is-align-self-flex-end"
+                @click="showMoreFriends('subscriptions')"
                 >Показать еще</b-button
               >
             </div>
@@ -182,7 +193,10 @@
         <div
           class="content is-flex is-flex-direction-column is-align-items-center"
         >
-          <span v-if="this.currentCity"> {{this.currentCity.country.title}} - {{this.currentCity.title}}</span>
+          <span v-if="this.currentCity">
+            {{ this.currentCity.country.title }} -
+            {{ this.currentCity.title }}</span
+          >
           <span v-if="profile.genderId">{{
             profile.genderId == 2 ? "Пол - женский" : "Пол - мужской"
           }}</span>
@@ -198,7 +212,9 @@
               is-flex-wrap-wrap
             "
           >
-            <div v-if="profile.interests && profile.interests.length">Интересы:</div>
+            <div v-if="profile.interests && profile.interests.length">
+              Интересы:
+            </div>
             <div class="interests__interest is-flex is-justify-content-center">
               <p v-for="interest in profile.interests" v-bind:key="interest.id">
                 {{ interest.title }}
@@ -209,6 +225,44 @@
       </div>
       <b-button type="is-danger" class="m-5" @click="save">Сохранить</b-button>
     </div>
+    <b-modal v-model="isModalActive">
+      <div
+        class="
+          card
+          is-flex
+          is-flex-wrap-nowrap
+          is-justify-content-center
+          is-flex-wrap-wrap
+          p-4
+        "
+      >
+        <div
+          v-for="friend in typeModalActive"
+          v-bind:key="friend.id"
+          class="person__group is-flex is-flex-wrap-nowrap p-2"
+        >
+          <figure class="image is-128x128 is-flex is-align-self-center">
+            <img src="@/assets/person.png" />
+          </figure>
+          <div>
+            <p class="person__name person__name-size is-align-self-center">
+              {{ friend.surname }} {{ friend.name }}
+              {{ friend.patronymic }}
+            </p>
+            <b-field label="Интересы">
+              <b-taginput
+                :value="friend.interests"
+                ellipsis
+                field="title"
+                :closable="false"
+                :readonly="true"
+              >
+              </b-taginput>
+            </b-field>
+          </div>
+        </div>
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -217,12 +271,7 @@ import Vue from "vue";
 import Profile from "../utils/Profile";
 import Data from "../utils/Data";
 import Cookie from "@/utils/Cookie";
-import { ToastProgrammatic as Toast } from 'buefy';
-
-interface IState {
-  selectedDate?: Date | null;
-  [x: string]: any;
-}
+import { ToastProgrammatic as Toast } from "buefy";
 
 interface IInterest {
   id: number;
@@ -240,10 +289,12 @@ export default Vue.extend({
       showWeekNumber: false,
       filteredTags: [] as any[],
       tags: [] as any[],
-      friends: [],
-      subscribers: [],
-      subscriptions: [],
-    } as IState;
+      friends: [] as any[],
+      subscribers: [] as any[],
+      subscriptions: [] as any[],
+      isModalActive: false,
+      typeModalActive: [] as any[],
+    };
   },
   computed: {
     currentCity(): object | undefined {
@@ -252,7 +303,46 @@ export default Vue.extend({
       }
 
       return this.cities.find((city: any) => city.id == this.profile.cityId);
-    }
+    },
+    friendsCrop() {
+      let index = 0;
+      const result = [] as any[];
+      for (let i = 0; i < this.friends.length; i++) {
+        if (index < 4) {
+          index++;
+          result.push(this.friends[i]);
+        } else {
+          break;
+        }
+      }
+      return result;
+    },
+    subscribersCrop() {
+      let index = 0;
+      const result = [] as any[];
+      for (let i = 0; i < this.subscribers.length; i++) {
+        if (index < 4) {
+          index++;
+          result.push(this.subscribers[i]);
+        } else {
+          break;
+        }
+      }
+      return result;
+    },
+    subscriptionsCrop() {
+      let index = 0;
+      const result = [] as any[];
+      for (let i = 0; i < this.subscriptions.length; i++) {
+        if (index < 4) {
+          index++;
+          result.push(this.subscriptions[i]);
+        } else {
+          break;
+        }
+      }
+      return result;
+    },
   },
   async created() {
     const myId = Cookie.getCookie("userId");
@@ -278,6 +368,11 @@ export default Vue.extend({
       .filter((f: any) => f.direction == 2)
       .map((f: any) => (f.firstId == myId ? f.second : f.first));
 
+    // убрать
+    for (let index = 0; index < 4; index++) {
+      this.friends = this.friends.concat(this.friends);
+    }
+
     this.subscribers = friendship
       .filter(
         (f: any) =>
@@ -300,16 +395,21 @@ export default Vue.extend({
   watch: {
     selectedDate(newValue: Date) {
       this.profile.birthDate = newValue.toISOString();
-    }
+    },
   },
   methods: {
     save() {
       const myId = Cookie.getCookie("userId");
-      Data.putQuery('person/' + myId, this.profile).then(() => {
-        Toast.open({message: 'Сохранение прошло успешно', type: 'is-success' })
-      }).catch(() => {
-        Toast.open({message: 'Сохранение не удалось', type: 'is-danger' })
-      });
+      Data.putQuery("person/" + myId, this.profile)
+        .then(() => {
+          Toast.open({
+            message: "Сохранение прошло успешно",
+            type: "is-success",
+          });
+        })
+        .catch(() => {
+          Toast.open({ message: "Сохранение не удалось", type: "is-danger" });
+        });
     },
     clearDate(): void {
       this.selectedDate = null;
@@ -347,6 +447,20 @@ export default Vue.extend({
         }
       }
       return age + " " + txt;
+    },
+    showMoreFriends(type: "friends" | "subscriptions" | "subscribers") {
+      this.isModalActive = true;
+      switch (type) {
+        case "friends":
+          this.typeModalActive = this.friends;
+          break;
+        case "subscriptions":
+          this.typeModalActive = this.subscriptions;
+          break;
+        case "subscribers":
+          this.typeModalActive = this.subscribers;
+          break;
+      }
     },
   },
 });

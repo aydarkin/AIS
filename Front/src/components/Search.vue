@@ -39,7 +39,7 @@
           v-for="interlocutor in searchInterlocutors"
           v-bind:key="interlocutor.id"
           class="
-            person__group
+            interlocutor__group
             is-flex is-flex-wrap-nowrap is-justify-content-start
             p-2
           "
@@ -90,8 +90,8 @@
           v-for="interlocutor in recommendationInterlocutors"
           v-bind:key="interlocutor.id"
           class="
-            person__group
-            is-flex is-flex-wrap-nowrap is-justify-content-space-center
+            interlocutor__group
+            is-flex is-flex-wrap-nowrap
             p-2
           "
         >
@@ -191,7 +191,7 @@ export default Vue.extend({
 .search-interlocutor__input {
 }
 
-.person__group {
+.interlocutor__group {
   width: 90%;
   gap: 10px;
 }
