@@ -36,10 +36,10 @@ namespace Back.Controllers
                               where x.UserId != current.UserId
                               orderby x.Interests.Select(i => i.Id ?? -1).Intersect(interests).ToList().Count descending
                               select x;
+                    persons = persons.Take(5);
                 }
                     
-                    
-                persons = persons.Take(5).ToList();
+                persons = persons.ToList();
             }
             return persons;
         }
