@@ -82,10 +82,17 @@ html {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
 
-  max-height: 100vh;
-  min-height: 100vh;
-  max-width: 100vw;
-  overflow: hidden;
+::-webkit-scrollbar { width: 8px; }
+
+::-webkit-scrollbar-track {
+  background: #eeeeee;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+  border-radius: 5px;
 }
 </style>

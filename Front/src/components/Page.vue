@@ -1,6 +1,6 @@
 <template>
-  <div class="Page">
-    <b-navbar type="is-primary" :spaced="true">
+  <div class="Page is-flex-grow-1 is-flex is-flex-direction-column">
+    <b-navbar type="is-primary" :spaced="true" class="is-flex-shrink-0">
       <template #start>
         <b-navbar-item v-on:click="route('profile')">
           <b-icon pack="fas" icon="user" size="is-small" />
@@ -25,7 +25,7 @@
         </b-navbar-item>
       </template>
     </b-navbar>
-    <div class="Page__content">
+    <div class="Page__content is-flex is-flex-direction-column is-flex-grow-1">
       <Profile v-if="page === 'profile'" />
       <Messenger v-if="page === 'messenger'" />
       <Search v-if="page === 'search'" />
@@ -70,5 +70,15 @@ export default Vue.extend({
 </script>
 
 <style>
+.Page {
+  max-height: 100vh;
+  min-height: 100vh;
+  max-width: 100vw;
+  overflow: hidden;
+}
 
+.Page__content {
+  overflow: hidden;
+  width: 100%;
+}
 </style>

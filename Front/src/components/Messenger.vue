@@ -1,5 +1,5 @@
 <template>
-  <div class="is-flex is-flex-wrap-wrap is-justify-content-space-around mt-5">
+  <div class="is-flex is-flex-direction-column m-5 is-align-items-center">
     <div class="card messenger mb-5" v-if="loaded">
       <b-tabs
         v-model="tabId"
@@ -254,7 +254,7 @@ export default Vue.extend({
 
 .interlocutor {
   overflow-y: auto;
-  height: 480px;
+  height: 640px;
 }
 
 .contact__form,

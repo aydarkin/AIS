@@ -1,17 +1,17 @@
 <template>
-  <div class="is-flex is-flex-wrap-nowrap is-justify-content-space-around mt-5">
+  <div class="Search is-flex is-flex-wrap-nowrap is-justify-content-space-around p-5 is-flex-grow-1">
     <div
       class="
         card
         search-interlocutor
-        is-flex is-flex-wrap-wrap is-justify-content-center
+        is-flex is-flex-direction-column
         pt-2
         pb-2
       "
     >
       <div
         class="
-          is-flex is-flex-wrap-wrap is-justify-content-center is-flex-grow-1
+          is-flex is-flex-wrap-wrap is-justify-content-center
           p-4
         "
       >
@@ -31,12 +31,12 @@
       </div>
       <div
         class="
-          search-interlocutor__group
-          is-flex is-flex-wrap-wrap is-justify-content-center
+          search-interlocutor__group is-flex-grow-1
+          is-flex is-flex-direction-column is-flex-shrink-1
         "
       >
         <div
-          v-for="interlocutor in searchionInterlocutors"
+          v-for="interlocutor in searchInterlocutors"
           v-bind:key="interlocutor.id"
           class="
             person__group
@@ -74,16 +74,16 @@
       class="
         card
         recommendation-interlocutor
-        is-flex is-flex-wrap-wrap is-justify-content-center
+        is-flex is-flex-direction-column
         pt-1
         pb-2
       "
     >
-      <p class="subtitle is-5">Рекомендуемые друзья</p>
+      <p class="subtitle is-5 has-text-centered">Рекомендуемые друзья</p>
       <div
         class="
           recommendation-interlocutor__group
-          is-flex is-flex-wrap-wrap is-justify-content-center
+          is-flex is-flex-direction-column is-flex-shrink-1
         "
       >
         <div
@@ -95,7 +95,7 @@
             p-2
           "
         >
-          <figure class="image is-128x128 is-flex is-align-self-center">
+          <figure class="image is-128x128 is-flex is-align-self-center is-flex-shrink-0">
             <img src="@/assets/person.png" />
           </figure>
           <div>
@@ -134,65 +134,8 @@ export default Vue.extend({
       filteredTags: undefined,
       myId: undefined as any,
       selected: "",
-      recommendationInterlocutors: [
-        {
-          id: 0,
-          surname: "Иванов",
-          name: "Иван",
-          patronymic: "Иванович",
-          img: "@/assets/person.png",
-          interests: [
-            {
-              id: 0,
-              title: "Книги",
-            },
-            {
-              id: 1,
-              title: "Музыка",
-            },
-          ],
-        },
-        {
-          id: 1,
-          surname: "Петров",
-          name: "Петр",
-          patronymic: "Петрович",
-          img: "@/assets/person.png",
-          interests: [
-            {
-              id: 0,
-              title: "Кинофильмы",
-            },
-            {
-              id: 1,
-              title: "Музыка",
-            },
-          ],
-        },
-      ],
-      searchionInterlocutors: [
-        {
-          id: 0,
-          surname: "Викторов",
-          name: "Виктор",
-          patronymic: "Викторович",
-          img: "@/assets/person.png",
-        },
-        {
-          id: 1,
-          surname: "Александров",
-          name: "Алексей",
-          patronymic: "Александрович",
-          img: "@/assets/person.png",
-        },
-        {
-          id: 2,
-          surname: "Иванов",
-          name: "Иван",
-          patronymic: "Иванович",
-          img: "@/assets/person.png",
-        },
-      ],
+      recommendationInterlocutors: [],
+      searchInterlocutors: [],
     };
   },
   async created() {
@@ -204,9 +147,12 @@ export default Vue.extend({
       id: this.myId
     }));
 
-    // const [recommended] = await Promise.all(
-    //   promises
-    // );
+    this.find();
+    const [recommended] = await Promise.all(
+      promises
+    );
+
+    this.recommendationInterlocutors = recommended;
   },
   watch: {
     // call again the method if the route changes
@@ -214,22 +160,32 @@ export default Vue.extend({
   },
   methods: {
     find() {
-      Data.getQuery("person", { fio: this.selected }).then((persons) => {
-        this.searchionInterlocutors = persons;
+      Data.getQuery("person", { fio: this.selected || '' }).then((persons) => {
+        this.searchInterlocutors = persons;
       });
     },
+    clearSearch() {
+      this.selected = '';
+    }
   },
 });
 </script>
 
 <style>
+.Search {
+  overflow: hidden;
+}
+
 .search-interlocutor {
   width: 40%;
   gap: 10px;
+
+  overflow: hidden;
 }
 
 .recommendation-interlocutor {
   width: 50%;
+  overflow: hidden;
 }
 
 .search-interlocutor__input {
@@ -243,6 +199,7 @@ export default Vue.extend({
 .search-interlocutor__group,
 .recommendation-interlocutor__group {
   width: 100%;
+  overflow: auto;
 }
 
 .person__info {
