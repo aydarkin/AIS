@@ -259,6 +259,7 @@
               >
               </b-taginput>
             </b-field>
+             <p v-if="friend.cityId">{{friend.city.title}}</p>
           </div>
         </div>
       </div>
