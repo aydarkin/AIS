@@ -22,6 +22,7 @@
 import Vue from "vue";
 import { ToastProgrammatic as Toast } from 'buefy';
 import Data from "../utils/Data";
+import Profile from "../utils/Profile";
 
 export default Vue.extend({
   data() {
@@ -41,6 +42,7 @@ export default Vue.extend({
         login: this.login,
         password: this.password
       }).then(() => {
+        Profile.clear();
         this.$router.push('/');
       }).catch(() => {
         Toast.open({message: 'Неправильный логин или пароль', type: 'is-danger' })

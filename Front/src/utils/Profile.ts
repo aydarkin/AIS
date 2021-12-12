@@ -15,4 +15,8 @@ export default class Profile {
             return Profile._model;
         });
     }
+
+    static clear() {
+        Profile._model = undefined;
+    }
 }

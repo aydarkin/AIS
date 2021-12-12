@@ -65,6 +65,9 @@
           <b-field label="Друзья">
             <div class="notification is-flex is-justify-content-space-between">
               <div class="is-flex is-flex-wrap-nowrap person__group">
+                <div v-if="!friends.length">
+                  Друзей нет
+                </div>
                 <div
                   v-for="friend in friends"
                   v-bind:key="friend.id"
@@ -81,7 +84,7 @@
                   </p>
                 </div>
               </div>
-              <b-button type="is-primary is-align-self-flex-end"
+              <b-button v-if="friends.length > 4" type="is-primary is-align-self-flex-end"
                 >Показать еще</b-button
               >
             </div>
@@ -89,6 +92,9 @@
           <b-field label="Подписчики">
             <div class="notification is-flex is-justify-content-space-between">
               <div class="is-flex is-flex-wrap-nowrap person__group">
+                <div v-if="!subscribers.length">
+                  Подписчиков нет
+                </div>
                 <div
                   v-for="subscriber in subscribers"
                   v-bind:key="subscriber.id"
@@ -105,7 +111,7 @@
                   </p>
                 </div>
               </div>
-              <b-button type="is-primary is-align-self-flex-end"
+              <b-button v-if="subscribers.length > 4" type="is-primary is-align-self-flex-end"
                 >Показать еще</b-button
               >
             </div>
@@ -113,6 +119,9 @@
           <b-field label="Подписки">
             <div class="notification is-flex is-justify-content-space-between">
               <div class="is-flex is-flex-wrap-nowrap person__group">
+                <div v-if="!subscriptions.length">
+                  Подписок нет
+                </div>
                 <div
                   v-for="subscription in subscriptions"
                   v-bind:key="subscription.id"
@@ -129,7 +138,7 @@
                   </p>
                 </div>
               </div>
-              <b-button type="is-primary is-align-self-flex-end"
+              <b-button v-if="subscriptions.length > 4" type="is-primary is-align-self-flex-end" 
                 >Показать еще</b-button
               >
             </div>
@@ -173,8 +182,8 @@
         <div
           class="content is-flex is-flex-direction-column is-align-items-center"
         >
-          <span>Страна - Город</span>
-          <span>{{
+          <span v-if="this.currentCity"> {{this.currentCity.country.title}} - {{this.currentCity.title}}</span>
+          <span v-if="profile.genderId">{{
             profile.genderId == 2 ? "Пол - женский" : "Пол - мужской"
           }}</span>
           <span v-if="this.selectedDate"
@@ -189,7 +198,7 @@
               is-flex-wrap-wrap
             "
           >
-            <div>Интересы:</div>
+            <div v-if="profile.interests && profile.interests.length">Интересы:</div>
             <div class="interests__interest is-flex is-justify-content-center">
               <p v-for="interest in profile.interests" v-bind:key="interest.id">
                 {{ interest.title }}
@@ -225,16 +234,25 @@ export default Vue.extend({
     return {
       // флаг загрузки
       loaded: false,
-      profile: undefined,
-      cities: [],
-      selectedDate: null,
+      profile: undefined as any,
+      cities: [] as any[],
+      selectedDate: null as Date | null,
       showWeekNumber: false,
-      filteredTags: undefined,
-      tags: undefined,
+      filteredTags: [] as any[],
+      tags: [] as any[],
       friends: [],
       subscribers: [],
       subscriptions: [],
     } as IState;
+  },
+  computed: {
+    currentCity(): object | undefined {
+      if (!this.profile?.cityId) {
+        return undefined;
+      }
+
+      return this.cities.find((city: any) => city.id == this.profile.cityId);
+    }
   },
   async created() {
     const myId = Cookie.getCookie("userId");

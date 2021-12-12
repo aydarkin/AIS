@@ -13,14 +13,14 @@ namespace Back.Models
 
         [BindNever]
         [JsonIgnore]
-        public User From { get; set; }
+        public User? From { get; set; }
 
         [Required]
         public int ToId { get; set; }
 
         [BindNever]
         [JsonIgnore]
-        public User To { get; set; }
+        public User? To { get; set; }
 
         [Required]
         public string Text { get; set; }

@@ -50,7 +50,10 @@
               "
             >
               <div
-                class="interlocutor__avatar is-flex is-flex-direction-column is-align-items-center"
+                class="
+                  interlocutor__avatar
+                  is-flex is-flex-direction-column is-align-items-center
+                "
               >
                 <figure class="image is-32x32">
                   <img src="@/assets/person.png" />
@@ -88,9 +91,14 @@
     </div>
     <div class="card contact__form is-flex pt-4 pl-4 pr-4 pb-2">
       <b-field class="contact__form_textarea is-flex-grow-1 mr-3">
-        <b-input placeholder="Напишите сообщение"></b-input>
+        <b-input placeholder="Напишите сообщение" v-model="sendText"></b-input>
       </b-field>
-      <b-button type="is-primary">Отправить</b-button>
+      <b-button
+        :disabled="!(allInterlocutors && allInterlocutors.length)"
+        type="is-primary"
+        @click="send"
+        >Отправить</b-button
+      >
     </div>
   </div>
 </template>
@@ -100,11 +108,13 @@ import Vue from "vue";
 import Profile from "../utils/Profile";
 import Data from "../utils/Data";
 import Cookie from "@/utils/Cookie";
+import { ToastProgrammatic as Toast } from "buefy";
 
 interface IMessage {
-  fromId: number;
-  toId: number;
-  text: string;
+  fromId?: number;
+  toId?: number;
+  text?: string;
+  date?: string;
 }
 
 export default Vue.extend({
@@ -119,6 +129,7 @@ export default Vue.extend({
       myId: undefined as any,
       tabId: 0,
       messages: [] as IMessage[],
+      sendText: undefined,
     };
   },
   computed: {
@@ -147,28 +158,29 @@ export default Vue.extend({
 
     const promises = [];
     promises.push(Profile.model);
-    promises.push(Data.getQuery("message", { from: this.myId || "" }));
-    promises.push(Data.getQuery("message", { to: this.myId || "" }));
+    promises.push(Data.getQuery("message", { forPerson: this.myId || "" }));
     promises.push(Data.getQuery("person"));
+    promises.push(Data.getQuery("friendship/" + this.myId));
 
-    const [profile, inputMessages, outputMessages, persons] = await Promise.all(
+    const [profile, allMessages, persons, friendships] = await Promise.all(
       promises
     );
     this.profile = profile;
 
-    const allMessages = inputMessages;
-    outputMessages.forEach((mes: any) => {
-      allMessages.push(mes);
-    });
-
-    const ids = new Set();
+    const ids = new Set<number>();
     allMessages.forEach((mes: any) => {
       ids.add(mes.fromId == this.myId ? mes.toId : mes.fromId);
     });
 
-    this.allInterlocutors = Array.from(ids).map((id) =>
-      persons.find((person: any) => person.userId === id)
-    );
+    friendships
+      .filter((f: any) => f.direction == 2)
+      .forEach((f: any) => {
+        ids.add(f.firstId == this.myId ? f.secondId : f.firstId);
+      });
+
+    this.allInterlocutors = Array.from(ids)
+      .sort((a: number, b: number) => a - b)
+      .map((id) => persons.find((person: any) => person.userId === id));
 
     this.interlocutorId = this.allInterlocutors[0].userId;
     this.messages = allMessages;
@@ -185,6 +197,29 @@ export default Vue.extend({
     getDateText(dateISO: string): string {
       const date = new Date(dateISO);
       return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    },
+
+    send() {
+      if (this.sendText) {
+        const message = {
+          fromId: this.myId,
+          toId: this.interlocutorId,
+          text: this.sendText,
+
+          date: new Date().toISOString(),
+        };
+        Data.jsonQuery("message", message)
+          .then(() => {
+            this.messages.unshift(message);
+            this.sendText = undefined;
+          })
+          .catch(() => {
+            Toast.open({
+              message: "Ошибка отправки сообщения",
+              type: "is-danger",
+            });
+          });
+      }
     },
   },
 });
