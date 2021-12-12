@@ -113,6 +113,7 @@
               >
               </b-taginput>
             </b-field>
+            <p v-if="interlocutor.cityId">{{interlocutor.city.title}}</p>
             <b-button type="is-danger is-light is-flex is-align-self-center"
               >Отправить заявку</b-button
             >

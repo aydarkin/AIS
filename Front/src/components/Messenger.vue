@@ -254,7 +254,7 @@ export default Vue.extend({
 
 .interlocutor {
   overflow-y: auto;
-  height: 640px;
+  height: 480px;
 }
 
 .contact__form,
