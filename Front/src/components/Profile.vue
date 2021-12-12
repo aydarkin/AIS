@@ -249,6 +249,7 @@
               {{ friend.surname }} {{ friend.name }}
               {{ friend.patronymic }}
             </p>
+            <p v-if="friend.cityId">{{ friend.city.title }}</p>
             <b-field label="Интересы">
               <b-taginput
                 :value="friend.interests"
@@ -259,7 +260,6 @@
               >
               </b-taginput>
             </b-field>
-             <p v-if="friend.cityId">{{friend.city.title}}</p>
           </div>
         </div>
       </div>

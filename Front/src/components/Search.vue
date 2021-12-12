@@ -1,5 +1,12 @@
 <template>
-  <div class="Search is-flex is-flex-wrap-nowrap is-justify-content-space-around p-5 is-flex-grow-1">
+  <div
+    class="
+      Search
+      is-flex is-flex-wrap-nowrap is-justify-content-space-around
+      p-5
+      is-flex-grow-1
+    "
+  >
     <div
       class="
         card
@@ -9,12 +16,7 @@
         pb-2
       "
     >
-      <div
-        class="
-          is-flex is-flex-wrap-wrap is-justify-content-center
-          p-4
-        "
-      >
+      <div class="is-flex is-flex-wrap-wrap is-justify-content-center p-4">
         <b-input
           placeholder="Найти друга по ФИО"
           v-model="selected"
@@ -31,8 +33,8 @@
       </div>
       <div
         class="
-          search-interlocutor__group is-flex-grow-1
-          is-flex is-flex-direction-column is-flex-shrink-1
+          search-interlocutor__group
+          is-flex-grow-1 is-flex is-flex-direction-column is-flex-shrink-1
         "
       >
         <div
@@ -89,13 +91,14 @@
         <div
           v-for="interlocutor in recommendationInterlocutors"
           v-bind:key="interlocutor.id"
-          class="
-            interlocutor__group
-            is-flex is-flex-wrap-nowrap
-            p-2
-          "
+          class="interlocutor__group is-flex is-flex-wrap-nowrap p-2"
         >
-          <figure class="image is-128x128 is-flex is-align-self-center is-flex-shrink-0">
+          <figure
+            class="
+              image
+              is-128x128 is-flex is-align-self-center is-flex-shrink-0
+            "
+          >
             <img src="@/assets/person.png" />
           </figure>
           <div>
@@ -103,6 +106,7 @@
               {{ interlocutor.surname }} {{ interlocutor.name }}
               {{ interlocutor.patronymic }}
             </p>
+            <p v-if="interlocutor.cityId">{{ interlocutor.city.title }}</p>
             <b-field label="Интересы">
               <b-taginput
                 :value="interlocutor.interests"
@@ -113,7 +117,6 @@
               >
               </b-taginput>
             </b-field>
-            <p v-if="interlocutor.cityId">{{interlocutor.city.title}}</p>
             <b-button type="is-danger is-light is-flex is-align-self-center"
               >Отправить заявку</b-button
             >
@@ -143,15 +146,15 @@ export default Vue.extend({
     this.myId = Cookie.getCookie("userId");
 
     const promises = [];
-    promises.push(Data.getQuery("person", {
-      mode: "recommended",
-      id: this.myId
-    }));
+    promises.push(
+      Data.getQuery("person", {
+        mode: "recommended",
+        id: this.myId,
+      })
+    );
 
     this.find();
-    const [recommended] = await Promise.all(
-      promises
-    );
+    const [recommended] = await Promise.all(promises);
 
     this.recommendationInterlocutors = recommended;
   },
@@ -161,13 +164,13 @@ export default Vue.extend({
   },
   methods: {
     find() {
-      Data.getQuery("person", { fio: this.selected || '' }).then((persons) => {
+      Data.getQuery("person", { fio: this.selected || "" }).then((persons) => {
         this.searchInterlocutors = persons;
       });
     },
     clearSearch() {
-      this.selected = '';
-    }
+      this.selected = "";
+    },
   },
 });
 </script>
