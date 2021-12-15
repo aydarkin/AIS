@@ -88,6 +88,7 @@
                   <p class="person__name is-size-7" :title="friend.name">
                     {{ friend.name }}
                   </p>
+                  <b-button type="is-danger" size="is-small" title="Удалить из друзей">-</b-button>
                 </div>
               </div>
               <b-button
@@ -116,6 +117,7 @@
                   <p class="person__name is-size-7" :title="subscriber.name">
                     {{ subscriber.name }}
                   </p>
+                  <b-button type="is-success" size="is-small" title="Принять заявку в друзья">+</b-button>
                 </div>
               </div>
               <b-button
@@ -144,6 +146,7 @@
                   <p class="person__name is-size-7" :title="subscription.name">
                     {{ subscription.name }}
                   </p>
+                  <b-button type="is-danger" size="is-small" title="Отписаться">-</b-button>
                 </div>
               </div>
               <b-button

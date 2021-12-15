@@ -29,11 +29,29 @@ namespace Back.Controllers
 
                 if (mode == "recommended")
                 {
+                    var friendships = db.Friendships
+                        .Where(f => f.FirstId == id || f.SecondId == id).ToList();
+
                     var current = db.Persons.Find(id);
                     List<int> interests = current.Interests.Select(i => i.Id ?? -1).ToList();
 
                     persons = from x in persons
                               where x.UserId != current.UserId
+                                && friendships.Find(
+                                    f =>
+                                    {
+                                        // проверяем друг или подписка
+                                        var isFirst = f.FirstId == x.UserId;
+                                        var isSecond = f.SecondId == x.UserId;
+
+                                        if (isFirst || isSecond)
+                                        {
+                                            return f.Direction == FriendDirection.Both
+                                                || f.Direction == (isFirst ? FriendDirection.SecondToFirst : FriendDirection.FirstToSecond);
+                                        } else
+                                            return false;
+                                    }
+                                    ) == null
                               orderby x.Interests.Select(i => i.Id ?? -1).Intersect(interests).ToList().Count descending
                               select x;
                     persons = persons.Take(5);

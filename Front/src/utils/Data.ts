@@ -3,7 +3,9 @@ import Cookie from './Cookie';
 export default class Data {
     static domain = 'http://localhost:5002/api/';
         
-    static async query(relativeURL: string, method: string, contentType?: string, body?: any, waitResult: boolean = true) {
+    static async query(
+        relativeURL: string, method: string, contentType?: string, body?: any, waitResult = true, forceResult = false
+    ) {
         let params = {
             method,
             headers: {},
@@ -28,7 +30,7 @@ export default class Data {
         const response = await fetch(this.domain + relativeURL, params);
         if(response.status >= 200 && response.status < 300) {
             if(waitResult) {
-                if (['POST', 'GET'].includes(method)) {
+                if (forceResult || ['POST', 'GET'].includes(method)) {
                     return await response.json();
                 }
             }
@@ -62,12 +64,12 @@ export default class Data {
         return await this.query(relativeURL, 'POST',  contentType, body, waitResult);
     }
 
-    static async putQuery(relativeURL: string, body: any, waitResult = true) {
-        return await this.query(relativeURL, 'PUT',  'application/json', JSON.stringify(body), waitResult);
+    static async putQuery(relativeURL: string, body: any, waitResult = true, forceResult = false) {
+        return await this.query(relativeURL, 'PUT',  'application/json', JSON.stringify(body), waitResult, forceResult);
     }
 
-    static async deleteQuery(relativeURL: string, waitResult = true) {
-        return await this.query(relativeURL, 'DELETE',  undefined, undefined, waitResult);
+    static async deleteQuery(relativeURL: string, waitResult = true, forceResult = false) {
+        return await this.query(relativeURL, 'DELETE',  undefined, undefined, waitResult, forceResult);
     }
 
     static async jsonQuery(relativeURL: string, params: any, waitResult = true) {

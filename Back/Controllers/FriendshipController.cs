@@ -55,31 +55,57 @@ namespace Back.Controllers
         [HttpPost]
         public ActionResult<Friendship> Post([FromBody] Friendship item)
         {
-            // TODO перейти на механизм изменения направления дружбы
-
-            Friendship friendship;
+            Friendship friendship = null;
             using (var db = new AppDBContext())
             {
-                friendship = db.Friendships.Add(item).Entity;
+                // считаем firstId инициатором
+                var query = db.Friendships.Where(f =>
+                    (f.FirstId == item.FirstId && f.SecondId == item.SecondId)
+                    || (f.SecondId == item.FirstId && f.FirstId == item.SecondId)
+                );
+                if (query.Any())
+                    friendship = query.First();
+
+                if (friendship != null)
+                {
+                    friendship.Direction = FriendDirection.Both;
+                } else
+                {
+                    item.Direction = FriendDirection.FirstToSecond;
+                    friendship = db.Friendships.Add(item).Entity;
+                }
                 db.SaveChanges();
             }
 
             return friendship;
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [HttpDelete()]
+        public IActionResult Delete(int from, int to)
         {
-            // TODO перейти на механизм изменения направления дружбы
-
             using (var db = new AppDBContext())
             {
-                var forDelete = db.Friendships.Find(id);
+                Friendship friendship = null;
 
-                if (forDelete == null)
+                var query = db.Friendships.Where(f =>
+                    (f.FirstId == from && f.SecondId == to)
+                    || (f.SecondId == from && f.FirstId == to)
+                );
+                if (query.Any())
+                    friendship = query.First();
+
+                if (friendship != null)
+                {
+                    if (friendship.Direction == FriendDirection.Both)
+                        // удаление из друзей, подписчик
+                        friendship.Direction = friendship.FirstId == from ? FriendDirection.SecondToFirst : FriendDirection.FirstToSecond;
+                    else
+                        // отмена подписки
+                        db.Friendships.Remove(friendship);
+                }
+                else
                     return NotFound();
-
-                db.Friendships.Remove(forDelete);
+                
                 db.SaveChanges();
             }
 
