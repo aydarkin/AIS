@@ -88,7 +88,7 @@
                   <p class="person__name is-size-7" :title="friend.name">
                     {{ friend.name }}
                   </p>
-                  <b-button type="is-danger" size="is-small" title="Удалить из друзей">-</b-button>
+                  <b-button type="is-danger" size="is-small" title="Удалить из друзей" @click="deleteFriendship(friend, true)">-</b-button>
                 </div>
               </div>
               <b-button
@@ -117,7 +117,7 @@
                   <p class="person__name is-size-7" :title="subscriber.name">
                     {{ subscriber.name }}
                   </p>
-                  <b-button type="is-success" size="is-small" title="Принять заявку в друзья">+</b-button>
+                  <b-button type="is-success" size="is-small" title="Принять заявку в друзья" @click="addFriendship(subscriber)">+</b-button>
                 </div>
               </div>
               <b-button
@@ -146,7 +146,7 @@
                   <p class="person__name is-size-7" :title="subscription.name">
                     {{ subscription.name }}
                   </p>
-                  <b-button type="is-danger" size="is-small" title="Отписаться">-</b-button>
+                  <b-button type="is-danger" size="is-small" title="Отписаться" @click="deleteFriendship(subscription)">-</b-button>
                 </div>
               </div>
               <b-button
@@ -368,30 +368,7 @@ export default Vue.extend({
     this.tags = allInterests;
     this.cities = allcities;
 
-    this.friends = friendship
-      .filter((f: any) => f.direction == 2)
-      .map((f: any) => (f.firstId == myId ? f.second : f.first));
-
-    // убрать
-    for (let index = 0; index < 4; index++) {
-      this.friends = this.friends.concat(this.friends);
-    }
-
-    this.subscribers = friendship
-      .filter(
-        (f: any) =>
-          (f.firstId == myId && f.direction == 1) ||
-          (f.secondId == myId && f.direction == 0)
-      )
-      .map((f: any) => (f.firstId == myId ? f.second : f.first));
-
-    this.subscriptions = friendship
-      .filter(
-        (f: any) =>
-          (f.firstId == myId && f.direction == 0) ||
-          (f.secondId == myId && f.direction == 1)
-      )
-      .map((f: any) => (f.firstId == myId ? f.second : f.first));
+    this.setFriendship(friendship);
 
     // флаг для отрисовки всего
     this.loaded = true;
@@ -402,6 +379,28 @@ export default Vue.extend({
     },
   },
   methods: {
+    setFriendship(friendship: any[]) {
+      const myId = Cookie.getCookie("userId");
+      this.friends = friendship
+      .filter((f: any) => f.direction == 2)
+      .map((f: any) => (f.firstId == myId ? f.second : f.first));
+
+      this.subscribers = friendship
+        .filter(
+          (f: any) =>
+            (f.firstId == myId && f.direction == 1) ||
+            (f.secondId == myId && f.direction == 0)
+        )
+        .map((f: any) => (f.firstId == myId ? f.second : f.first));
+
+      this.subscriptions = friendship
+        .filter(
+          (f: any) =>
+            (f.firstId == myId && f.direction == 0) ||
+            (f.secondId == myId && f.direction == 1)
+        )
+        .map((f: any) => (f.firstId == myId ? f.second : f.first));
+    },
     save() {
       const myId = Cookie.getCookie("userId");
       Data.putQuery("person/" + myId, this.profile)
@@ -465,6 +464,51 @@ export default Vue.extend({
           this.typeModalActive = this.subscribers;
           break;
       }
+    },
+    addFriendship(person: any) {
+      Data.jsonQuery("friendship", {
+        firstId: this.profile.userId,
+        secondId: person.userId,
+      })
+        .then(() => {
+          const index = this.subscribers.findIndex((f) => f.userId == person.userId);
+          this.subscribers.splice(index, 1); // удаляем
+
+          this.friends.push(person);
+          Toast.open({
+            message: "Заявка принята",
+            type: "is-success",
+          });
+        })
+        .catch(() => {
+          Toast.open({ message: "Операция не удалась", type: "is-danger" });
+        });
+    },
+
+    deleteFriendship(person: any, isFriend = false) {
+      Data.deleteQuery(`friendship?from=${this.profile.userId}&to=${person.userId}`)
+        .then(() => {
+          let message = '';
+          if (isFriend) {
+            message = 'Удален из друзей';
+            const index = this.friends.findIndex((f) => f.userId == person.userId);
+            this.friends.splice(index, 1); // удаляем
+
+            this.subscribers.push(person);
+          } else {
+            message = 'Подписка отменена';
+            const index = this.subscriptions.findIndex((f) => f.userId == person.userId);
+            this.subscriptions.splice(index, 1); // удаляем
+          }
+
+          Toast.open({
+            message,
+            type: "is-success",
+          });
+        })
+        .catch(() => {
+          Toast.open({ message: "Операция не удалась", type: "is-danger" });
+        });
     },
   },
 });

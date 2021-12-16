@@ -66,8 +66,19 @@
               </div>
             </div>
           </div>
-          <b-button type="is-danger is-light is-flex is-align-self-center"
-            >Отправить заявку</b-button
+          <b-button
+            type="is-danger is-light is-flex is-align-self-center"
+            @click="handleFriendship(interlocutor)"
+          >
+            {{
+              interlocutor.type == 2
+                ? "Удалить из друзей"
+                : interlocutor.type == 1
+                ? "Принять заявку"
+                : interlocutor.type == 0
+                ? "Отменить заявку"
+                : "Отправить заявку"
+            }}</b-button
           >
         </div>
       </div>
@@ -117,7 +128,7 @@
               >
               </b-taginput>
             </b-field>
-            <b-button type="is-danger is-light is-flex is-align-self-center"
+            <b-button type="is-danger is-light is-flex is-align-self-center" @click="addFriendship(interlocutor)"
               >Отправить заявку</b-button
             >
           </div>
@@ -131,6 +142,7 @@
 import Vue from "vue";
 import Data from "../utils/Data";
 import Cookie from "../utils/Cookie";
+import { ToastProgrammatic as Toast } from "buefy";
 
 export default Vue.extend({
   data() {
@@ -145,31 +157,112 @@ export default Vue.extend({
   async created() {
     this.myId = Cookie.getCookie("userId");
 
-    const promises = [];
-    promises.push(
-      Data.getQuery("person", {
-        mode: "recommended",
-        id: this.myId,
-      })
-    );
-
     this.find();
-    const [recommended] = await Promise.all(promises);
-
-    this.recommendationInterlocutors = recommended;
+    this.loadRecommended();
   },
   watch: {
     // call again the method if the route changes
     $route: "fetchData",
   },
   methods: {
-    find() {
-      Data.getQuery("person", { fio: this.selected || "" }).then((persons) => {
-        this.searchInterlocutors = persons;
+    async loadRecommended() {
+      const promises = [];
+      promises.push(
+        Data.getQuery("person", {
+          mode: "recommended",
+          id: this.myId,
+        })
+      );
+      const [recommended] = await Promise.all(promises);
+
+      this.recommendationInterlocutors = recommended;
+    },
+
+    async find() {
+      const promises = [];
+      promises.push(Data.getQuery("person", { fio: this.selected || "" }));
+      promises.push(Data.getQuery("friendship/" + this.myId));
+      const [persons, friendships] = await Promise.all(promises);
+
+      const friends = friendships
+        .filter((f: any) => f.direction == 2)
+        .map((f: any) => (f.firstId == this.myId ? f.second : f.first));
+
+      const subscribers = friendships
+        .filter(
+          (f: any) =>
+            (f.firstId == this.myId && f.direction == 1) ||
+            (f.secondId == this.myId && f.direction == 0)
+        )
+        .map((f: any) => (f.firstId == this.myId ? f.second : f.first));
+
+      const subscriptions = friendships
+        .filter(
+          (f: any) =>
+            (f.firstId == this.myId && f.direction == 0) ||
+            (f.secondId == this.myId && f.direction == 1)
+        )
+        .map((f: any) => (f.firstId == this.myId ? f.second : f.first));
+
+      persons.forEach((person: any) => {
+        person.type = null;
+
+        if (friends.find((f: any) => f.userId == person.userId)) {
+          person.type = 2;
+        } else if (subscribers.find((f: any) => f.userId == person.userId)) {
+          person.type = 1;
+        } else if (subscriptions.find((f: any) => f.userId == person.userId)) {
+          person.type = 0;
+        }
       });
+
+      this.searchInterlocutors = persons;
     },
     clearSearch() {
       this.selected = "";
+    },
+
+    addFriendship(person: any) {
+      Data.jsonQuery("friendship", {
+        firstId: this.myId,
+        secondId: person.userId,
+      })
+        .then(() => {
+          return Promise.all([this.find(), this.loadRecommended()])
+        })
+        .then(() => {
+          Toast.open({
+            message: "Операция прошла успешно",
+            type: "is-success",
+          });
+        })
+        .catch(() => {
+          Toast.open({ message: "Операция не удалась", type: "is-danger" });
+        });
+    },
+
+    deleteFriendship(person: any) {
+      Data.deleteQuery(`friendship?from=${this.myId}&to=${person.userId}`)
+        .then(() => {
+          return Promise.all([this.find(), this.loadRecommended()])
+        })
+        .then(() => {
+          Toast.open({
+            message: "Операция прошла успешно",
+            type: "is-success",
+          });
+        })
+        .catch(() => {
+          Toast.open({ message: "Операция не удалась", type: "is-danger" });
+        });
+    },
+
+    handleFriendship(person: any) {
+      if (person.type == 2 || person.type == 0) {
+        this.deleteFriendship(person);
+      } else {
+        this.addFriendship(person);
+      }
     },
   },
 });
@@ -190,9 +283,6 @@ export default Vue.extend({
 .recommendation-interlocutor {
   width: 50%;
   overflow: hidden;
-}
-
-.search-interlocutor__input {
 }
 
 .interlocutor__group {
